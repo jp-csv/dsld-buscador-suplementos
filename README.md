@@ -22,12 +22,13 @@
 
 ## La app
 
-Pensada para **desarrollo de producto**. La app abre con los productos **botánicos** (*Botanical* y *Botanical with Nutrients*, 67,449 etiquetas); el filtro **Tipo de producto** abre el resto (vitaminas, minerales, aminoácidos, grasas, otras combinaciones…). Los filtros de la barra lateral (tipo, ingrediente, palabra del título, marca, forma, atributos, estatus y año) se aplican a cuatro secciones:
+Pensada para **desarrollo de producto**. La app abre con los productos **botánicos** (*Botanical* y *Botanical with Nutrients*, 67,449 etiquetas); el filtro **Tipo de producto** abre el resto (con los botones *Todos* y *Botánicos* para cambiar rápido; vitaminas, minerales, aminoácidos, grasas, otras combinaciones…). Los filtros de la barra lateral (tipo, ingrediente, palabra del título, marca, forma, atributos, estatus y año) se aplican a cinco secciones:
 
 - **Buscador:** indicadores, formas, marcas, con qué se combina, atributos declarados, dosis y palabras de los títulos, más la lista de productos con link a la etiqueta original y descarga en CSV.
 - **Dosis de referencia:** rango de dosis declaradas de un ingrediente por forma (P10, Q1, mediana, Q3, P90), en la unidad más usada del ingrediente.
 - **Huecos de mercado:** mapa ingrediente × forma con el número de etiquetas; las celdas claras son combinaciones poco exploradas.
 - **Comparar marcas:** hasta tres marcas lado a lado (formas, atributos e ingredientes principales).
+- **Altas por año:** cuántas etiquetas entraron al DSLD cada año (en número o como % de las altas del año), con desglose por estatus, tipo de producto o forma. Es el año de alta en la base, no el de lanzamiento: sirve como referencia de tendencia.
 
 Para correrla en tu computadora:
 
@@ -50,7 +51,7 @@ python utilidades/preparar_datos.py DSLD-full-database-CSV/ dsld_json_extra.csv
 - **Etiquetas, no productos:** una misma presentación puede tener varias etiquetas (tamaños, sabores).
 - **Nombres de ingredientes:** se limpian de forma aproximada (*turmeric root extract* cuenta como *turmeric*) y las vitaminas con varios nombres se agrupan (*ascorbic acid* = *vitamin C*).
 - **Información nutrimental:** las filas de calorías, grasa total, carbohidratos y azúcares se quitan de la lista de ingredientes.
-- **Dosis:** son las de la etiqueta por porción; la vitamina D se convierte de IU a mcg, y las IU de las vitaminas A y E no se comparan porque dependen de la forma química.
+- **Dosis estandarizadas:** son las de la etiqueta por porción. La masa (g, mg, mcg) se lleva a una base común, la vitamina D se convierte de IU a mcg, y para cada ingrediente se usa la unidad que más etiquetas declaran; las IU de las vitaminas A y E no se mezclan con masas porque dependen de la forma química. La app muestra cuántas etiquetas entran en cada caso, y la sección *Dosis de referencia* explica el método.
 
 ## Limitaciones
 

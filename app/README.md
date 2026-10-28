@@ -1,41 +1,64 @@
-# App · Buscador de suplementos
+# Buscador de suplementos (DSLD) · Dietary supplement label search
 
-App de Streamlit para explorar las 214,780 etiquetas del DSLD, pensada para **desarrollo de producto**. Abre filtrada a los productos botánicos (herbales); el filtro **Tipo de producto** permite ver el resto.
+**English summary.** An interactive **Streamlit app** to search the NIH [Dietary Supplement Label Database (DSLD)](https://dsld.od.nih.gov/): **214,780 U.S. supplement labels** of every product type. It opens filtered to botanical (herbal) products and a filter lets you switch to vitamins, minerals, amino acids, fats and the rest. Built for product developers: search by ingredient, title keyword, brand, form or label claim (vegan, organic…), get reference dose ranges by form, spot ingredient × form gaps and compare brands. Built with Python, pandas, Altair and Streamlit.
 
-![Buscador](capturas/buscador.png)
+**App:** [abrir el buscador](https://TU-APP.streamlit.app) <!-- reemplaza con el link de tu app -->
 
-## Secciones
+![Buscador](app/capturas/buscador.png)
 
-- **Buscador:** filtra por tipo de producto, ingrediente, palabra o frase del título, marca, forma, atributos de la etiqueta (*Vegan*, *Organic*, *Gluten Free*…), estatus y año de entrada. Muestra indicadores, formas, marcas, con qué se combina, atributos declarados, dosis (si eliges un ingrediente) y palabras de los títulos. Abajo, la lista de productos con link a la etiqueta original en el DSLD y descarga en CSV.
-- **Dosis de referencia:** para un ingrediente, el rango de dosis declaradas por forma (P10 a P90, mitad central y mediana).
-- **Huecos de mercado:** mapa de ingrediente × forma con el número (o porcentaje) de etiquetas, para ingredientes botánicos, vitaminas y minerales, aminoácidos o todos.
-- **Comparar marcas:** hasta tres marcas lado a lado.
-- **Altas por año:** etiquetas que entraron al DSLD cada año, en número o como % de las altas del año, con desglose opcional por estatus, tipo de producto o forma. Es el año de captura en la base, no el de lanzamiento.
+## Qué hay aquí
 
-Los filtros de la barra lateral se aplican a todas las secciones (en *Comparar marcas* se ignora el filtro de marca).
+```
+├── app/                       ← app de Streamlit
+│   ├── app.py
+│   ├── datos/                 ← datos ya preparados en Parquet (~19 MB)
+│   └── capturas/
+├── utilidades/
+│   ├── dsld_extract_json.py   ← extrae campos del JSON del DSLD
+│   └── preparar_datos.py      ← genera los Parquet de la app
+├── requirements.txt           ← dependencias de la app
+└── DESPLIEGUE.md              ← cómo publicar la app gratis en Streamlit Community Cloud
+```
 
-## Detalles
+## La app
 
-- **Tipo de producto:** los botones *Todos* y *Botánicos* cambian la selección de golpe; vacío = todos los tipos. Con tipos distintos de botánico, «Con qué se combina» y los mapas pasan solos a incluir vitaminas y minerales.
-- **Variantes del nombre:** con la casilla activada, «turmeric» también incluye «turmeric co2», «turmeric 95»… (nombres que contienen esa palabra completa).
-- **Dosis:** una por etiqueta (si se repite, la mediana), en la unidad más usada del ingrediente; la masa se muestra en mg o mcg según el tamaño típico. Vitamina D: IU convertidas a mcg. IU de A y E, mL y CFU no se mezclan con masas. Arriba de la gráfica se indica cuántas etiquetas entran, cuántas usan otra unidad y cuántas no declaran cantidad; el detalle del método está en la sección *Dosis de referencia*.
-- **Lista de ingredientes:** solo aparecen los que tienen al menos 5 etiquetas.
-- **Cargas masivas:** por defecto se excluyen TerraVita Premium Collection, TerraVita, Herbal Terra y Hawaii Pharm.
-- En listas muy grandes, las palabras de los títulos se calculan con una muestra de 30,000 etiquetas. La tabla muestra hasta 1,000 productos; la descarga trae todos.
+Pensada para **desarrollo de producto**. La app abre con los productos **botánicos** (*Botanical* y *Botanical with Nutrients*, 67,449 etiquetas); el filtro **Tipo de producto** abre el resto (con cuadritos seleccionables y un cuadrito *Todos* que marca o desmarca todos; vitaminas, minerales, aminoácidos, grasas, otras combinaciones…). Los filtros de la barra lateral (tipo, ingrediente, palabra del título, marca, forma, atributos, estatus y año) se aplican a cinco secciones:
 
-## Datos
+- **Buscador:** indicadores, formas, marcas, con qué se combina, atributos declarados, dosis y palabras de los títulos, más la lista de productos con link a la etiqueta original y descarga en CSV.
+- **Dosis de referencia:** rango de dosis declaradas de un ingrediente por forma (P10, Q1, mediana, Q3, P90), en la unidad más usada del ingrediente.
+- **Huecos de mercado:** mapa ingrediente × forma con el número de etiquetas; las celdas claras son combinaciones poco exploradas.
+- **Comparar marcas:** hasta tres marcas lado a lado (formas, atributos e ingredientes principales).
+- **Altas por año:** cuántas etiquetas entraron al DSLD cada año (en número o como % de las altas del año), con desglose por estatus, tipo de producto o forma. Es el año de alta en la base, no el de lanzamiento: sirve como referencia de tendencia.
 
-`datos/` contiene tres archivos Parquet (~19 MB) generados con `utilidades/preparar_datos.py`:
-
-- `etiquetas.parquet`: una fila por etiqueta (producto, marca, tipo, forma, estatus, año de entrada, porción, contenido, link, si tiene mezcla).
-- `ingredientes.parquet`: una fila por ingrediente declarado (nombre original y limpio, categoría, valor y unidad).
-- `atributos.parquet`: una fila por etiqueta y atributo declarado (del JSON del DSLD).
-
-## Correrla en local
-
-Desde la raíz del repositorio:
+Para correrla en tu computadora:
 
 ```bash
 pip install -r requirements.txt
 streamlit run app/app.py
 ```
+
+Para regenerar los datos (por ejemplo, con una descarga más reciente del DSLD):
+
+```bash
+python utilidades/dsld_extract_json.py DSLD-full-database-JSON.zip dsld_json_extra.csv
+python utilidades/preparar_datos.py DSLD-full-database-CSV/ dsld_json_extra.csv
+```
+
+## Decisiones que conviene conocer
+
+- **Cargas masivas:** cuatro marcas (TerraVita Premium Collection, TerraVita, Herbal Terra y Hawaii Pharm) subieron miles de etiquetas por lotes y distorsionan los resultados; la app las excluye por defecto.
+- **Año de entrada ≠ lanzamiento:** es la fecha en que se capturó la etiqueta en el DSLD.
+- **Etiquetas, no productos:** una misma presentación puede tener varias etiquetas (tamaños, sabores).
+- **Nombres de ingredientes:** se limpian de forma aproximada (*turmeric root extract* cuenta como *turmeric*) y las vitaminas con varios nombres se agrupan (*ascorbic acid* = *vitamin C*).
+- **Información nutrimental:** las filas de calorías, grasa total, carbohidratos y azúcares se quitan de la lista de ingredientes.
+- **Dosis estandarizadas:** son las de la etiqueta por porción. La masa (g, mg, mcg) se lleva a una base común, la vitamina D se convierte de IU a mcg, y para cada ingrediente se usa la unidad que más etiquetas declaran; las IU de las vitaminas A y E no se mezclan con masas porque dependen de la forma química. La app muestra cuántas etiquetas entran en cada caso, y la sección *Dosis de referencia* explica el método.
+
+## Limitaciones
+
+- Los datos son lo **declarado en etiquetas**; el NIH no verifica su exactitud.
+- No hay ventas ni demanda: el proyecto describe qué existe, no qué se vende ni qué funciona.
+- Son datos de EE. UU.; no equivalen al mercado mexicano.
+
+## Fuente de los datos
+
+NIH Office of Dietary Supplements, Dietary Supplement Label Database (DSLD), descarga completa de enero de 2026 (214,780 etiquetas).

@@ -121,11 +121,17 @@ def num(v):
 st.sidebar.title("Filtros")
 st.sidebar.caption("Se aplican a todas las secciones. Los nombres están en inglés, como en el DSLD.")
 
+BOTANICOS = [t for t in TIPOS_BOTANICOS if t in TIPO_N.index]
+if "sel_tipo" not in st.session_state:
+    st.session_state["sel_tipo"] = BOTANICOS  # por defecto, productos botánicos
 sel_tipo = st.sidebar.multiselect(
-    "Tipo de producto", TIPO_N.index.tolist(), default=[t for t in TIPOS_BOTANICOS if t in TIPO_N.index],
+    "Tipo de producto", TIPO_N.index.tolist(), key="sel_tipo",
     format_func=lambda n: f"{n} ({TIPO_N[n]:,})", placeholder="Todos los tipos", select_all=False,
-    help="Por defecto se muestran los productos botánicos (herbales). Quita las opciones para ver todos los tipos, "
-         "o elige otros (vitaminas, minerales, aminoácidos…).")
+    help="Por defecto se muestran los productos botánicos (herbales). Elige otros tipos (vitaminas, minerales, "
+         "aminoácidos…) o usa los botones de abajo. Sin ninguna opción elegida se ven todos los tipos.")
+_b1, _b2 = st.sidebar.columns(2)
+_b1.button("Todos", on_click=lambda: st.session_state.update(sel_tipo=[]), width="stretch")
+_b2.button("Botánicos", on_click=lambda: st.session_state.update(sel_tipo=BOTANICOS), width="stretch")
 sel_ing = st.sidebar.multiselect(
     "Ingrediente", ING_N.index.tolist(), format_func=lambda n: f"{n} ({ING_N[n]:,})",
     placeholder="Escribe para buscar, p. ej. turmeric", select_all=False)
@@ -165,7 +171,7 @@ def ids_de_ingrediente(nombre):
     return set(ingredientes.loc[ingredientes["ingrediente"].isin(nombres_de(nombre)), "dsld_id"].unique())
 
 
-def filtrar(con_marca=True):
+def filtrar(con_marca=True, con_anio=True):
     e = etiquetas
     if excluir_masiva:
         e = e[~e["carga_masiva"]]
@@ -187,7 +193,8 @@ def filtrar(con_marca=True):
             e = e[e["dsld_id"].isin(atributos.loc[atributos["atributo"] == atr, "dsld_id"])]
     if sel_estatus != "Todos":
         e = e[e["estatus"] == sel_estatus]
-    e = e[e["anio_entrada"].between(*sel_anios)]
+    if con_anio:
+        e = e[e["anio_entrada"].between(*sel_anios)]
     return e
 
 
@@ -204,7 +211,8 @@ st.title("Buscador de suplementos")
 st.caption("Etiquetas del Dietary Supplement Label Database (DSLD, NIH). Por defecto: productos botánicos (herbales); "
            "cambia el filtro «Tipo de producto» para ver el resto. Los conteos son de etiquetas, no de productos distintos.")
 
-SECCIONES = ["🔎 Buscador", "💊 Dosis de referencia", "🧩 Huecos de mercado", "⚖️ Comparar marcas", "ℹ️ Acerca de"]
+SECCIONES = ["🔎 Buscador", "💊 Dosis de referencia", "🧩 Huecos de mercado", "⚖️ Comparar marcas", "📈 Altas por año",
+             "ℹ️ Acerca de"]
 # Solo se calcula la sección elegida (más rápido que pestañas, que calculan todo en cada cambio).
 seccion = st.segmented_control("Sección", SECCIONES, default=SECCIONES[0], label_visibility="collapsed") or SECCIONES[0]
 
@@ -244,18 +252,51 @@ def dosis_por_etiqueta(filas):
     """Una dosis por etiqueta (mediana si el ingrediente se repite) en la unidad más usada del ingrediente.
 
     La masa se maneja en mcg y se muestra en mg si las dosis típicas son de 1 mg o más.
-    Devuelve (dosis por dsld_id, unidad)."""
+    Devuelve (dosis por dsld_id, unidad, cobertura); la cobertura dice cuántas etiquetas tienen el
+    ingrediente, cuántas entran en la unidad elegida, cuántas lo declaran en otra unidad y cuántas sin cantidad."""
+    total = filas["dsld_id"].nunique()
     d = filas.dropna(subset=["valor"])
     if d.empty:
-        return pd.Series(dtype="float64"), ""
+        return pd.Series(dtype="float64"), "", {"total": total, "en_unidad": 0, "otra_unidad": 0, "sin_cantidad": total}
     u = d["unidad"].astype(str)
     dominante = u.value_counts().index[0]
     por_etiqueta = d[u == dominante].groupby("dsld_id", observed=True)["valor"].median().astype("float64")
+    otra = len(set(d.loc[u != dominante, "dsld_id"]) - set(por_etiqueta.index))
+    cobertura = {"total": total, "en_unidad": len(por_etiqueta), "otra_unidad": otra,
+                 "sin_cantidad": total - len(por_etiqueta) - otra}
     if dominante == "mcg":
         if por_etiqueta.median() >= 1000:
-            return por_etiqueta / 1000, "mg"
-        return por_etiqueta, "mcg"
-    return por_etiqueta, dominante
+            return por_etiqueta / 1000, "mg", cobertura
+        return por_etiqueta, "mcg", cobertura
+    return por_etiqueta, dominante, cobertura
+
+
+EXPLICACION_DOSIS = """
+Cada etiqueta declara las cantidades en la unidad que quiere (g, mg, mcg, IU…), así que no se pueden comparar tal cual.
+Para compararlas se hace esto:
+
+1. **Masa a una base común.** g, mg, mcg y ng se convierten a microgramos (1 mg = 1,000 mcg; 1 g = 1,000,000 mcg),
+   para no perder precisión en vitaminas que se dosifican en mcg.
+2. **Vitamina D.** Tiene una equivalencia fija (1 IU = 0.025 mcg), así que sus IU se pasan a mcg y se mezclan con las
+   etiquetas que ya la declaran en mcg.
+3. **Otras unidades se dejan como están.** Las IU de la vitamina A y de la E dependen de la forma química (no hay una
+   conversión única), y mcg DFE (folato), mcg RAE, mg NE (niacina), CFU (probióticos) o mL no equivalen a una masa.
+   Solo se unifican los nombres de una misma unidad (UI = IU, mcg RE = mcg RAE).
+4. **Una unidad por ingrediente.** Para cada ingrediente se usa la unidad que más etiquetas declaran. Las etiquetas que
+   lo declaran en otra unidad no se mezclan; se cuentan y se avisan arriba de la gráfica.
+5. **Una dosis por etiqueta.** Si el ingrediente aparece varias veces en una etiqueta, se toma la mediana.
+6. **Cómo se muestra.** Si la dosis típica es de 1 mg o más, se muestra en **mg**; si es menor, en **mcg**.
+   Por eso la vitamina B12 sale en mcg y la cúrcuma en mg.
+
+Todo es **por porción** (lo que dice «Serving Size» de la etiqueta), no por día ni por envase.
+"""
+
+
+def texto_cobertura(c, unidad):
+    return (f"Unidad: **{unidad}** (la más usada para este ingrediente). De {c['total']:,} etiquetas con el ingrediente, "
+            f"{c['en_unidad']:,} lo declaran en {unidad}; {c['otra_unidad']:,} lo declaran en otra unidad y "
+            f"{c['sin_cantidad']:,} no declaran cantidad (por ejemplo, dentro de una mezcla propietaria). "
+            "Solo cuentan las primeras.")
 
 
 # =========================================================================================
@@ -305,7 +346,7 @@ if seccion == SECCIONES[0]:
         col1, col2 = st.columns(2)
         with col1:
             if len(sel_ing) == 1:
-                dosis, u_dosis = dosis_por_etiqueta(ing_sub[ing_sub["ingrediente"].isin(nombres_de(sel_ing[0]))])
+                dosis, u_dosis, cob = dosis_por_etiqueta(ing_sub[ing_sub["ingrediente"].isin(nombres_de(sel_ing[0]))])
                 if len(dosis) >= 10:
                     tope = dosis.quantile(0.95)
                     df = dosis[dosis <= tope].rename("dosis").reset_index()
@@ -317,7 +358,7 @@ if seccion == SECCIONES[0]:
                     linea = alt.Chart(pd.DataFrame({"dosis": [med]})).mark_rule(color=BLUE_DARK, strokeWidth=2).encode(x="dosis:Q")
                     mostrar((hist + linea).properties(
                         title=titulo(f"Dosis declaradas de {sel_ing[0]}: mediana {num(med)} {u_dosis} (línea)",
-                                     f"Una dosis por etiqueta (n = {len(dosis):,}); masas convertidas a {u_dosis}")), 300)
+                                     f"Una dosis por etiqueta (n = {len(dosis):,}); unidad estandarizada, ver «Dosis de referencia»")), 300)
                 else:
                     st.info(f"Pocas dosis declaradas para {sel_ing[0]} con estos filtros (n = {len(dosis)}).")
             else:
@@ -380,7 +421,9 @@ if seccion == SECCIONES[1]:
     ing_d = st.selectbox("Ingrediente", opciones_dosis, index=opciones_dosis.index(defecto),
                          format_func=lambda x: f"{x} ({ING_N[x]:,})")
     filas = ingredientes[ingredientes["ingrediente"].isin(nombres_de(ing_d)) & ingredientes["dsld_id"].isin(ids_sub)]
-    dosis, u_dosis = dosis_por_etiqueta(filas)
+    dosis, u_dosis, cob = dosis_por_etiqueta(filas)
+    if u_dosis:
+        st.caption(texto_cobertura(cob, u_dosis))
     dosis = dosis.rename("dosis").reset_index().merge(sub[["dsld_id", "forma"]], on="dsld_id")
     resumen = (dosis.groupby("forma")["dosis"]
                .describe(percentiles=[.1, .25, .5, .75, .9])[["count", "10%", "25%", "50%", "75%", "90%"]])
@@ -409,11 +452,10 @@ if seccion == SECCIONES[1]:
         tabla_d["Etiquetas"] = tabla_d["Etiquetas"].astype(int)
         tabla_d.index.name = "Forma"
         st.dataframe(tabla_d, width="stretch")
-        st.caption(f"Dosis por **porción** tal como se declara en la etiqueta (una por etiqueta; si se repite, la mediana), "
-                   f"en **{u_dosis}**. Se usa la unidad más común del ingrediente: g, mg y mcg se convierten entre sí y "
-                   "la vitamina D se pasa de IU a mcg; las etiquetas que lo declaran en otra unidad (IU de vitaminas A y E, "
-                   "mL, CFU…) no se cuentan. El DSLD no distingue entre polvo crudo y extracto estandarizado, así que un "
-                   "mismo ingrediente puede mezclar ambos.")
+        st.caption(f"Dosis por **porción** tal como se declara en la etiqueta, en **{u_dosis}**. El DSLD no distingue "
+                   "entre polvo crudo y extracto estandarizado, así que un mismo ingrediente puede mezclar ambos.")
+    with st.expander("¿Cómo se estandarizan las dosis?"):
+        st.markdown(EXPLICACION_DOSIS)
 
 
 # =========================================================================================
@@ -536,10 +578,82 @@ if seccion == SECCIONES[3]:
                         alto_grupos(len(tops)))
 
 
+
 # =========================================================================================
-# 5. Acerca de
+# 5. Altas por año
 # =========================================================================================
 if seccion == SECCIONES[4]:
+    st.markdown("Cuántas etiquetas **entraron al DSLD cada año**, dentro de los filtros (aquí se ignora el filtro de año).")
+    st.warning("El año es el de **alta en la base de datos**, no el año en que el producto salió al mercado: una marca "
+               "puede capturar de golpe etiquetas de productos viejos, y el DSLD fue creciendo con los años. "
+               "Úsalo como referencia de tendencia, no como fecha de lanzamiento.", icon="⚠️")
+    base_a = filtrar(con_anio=False)
+    if base_a.empty:
+        st.info("Ninguna etiqueta cumple los filtros.")
+    else:
+        anios = list(range(anio_min, anio_max + 1))
+        tot_universo = universo["anio_entrada"].value_counts().reindex(anios, fill_value=0)
+        c1, c2 = st.columns(2)
+        modo_a = c1.radio("Mostrar", ["Etiquetas", "% de las altas del año"], horizontal=True,
+                          help="El porcentaje es sobre todas las etiquetas dadas de alta ese año en los tipos de producto "
+                               "elegidos (sin cargas masivas si la casilla está activa). Sirve para ver si algo gana o "
+                               "pierde peso, aunque cambie el tamaño de la base.")
+        desglose = c2.selectbox("Desglosar por", ["Sin desglose", "Estatus actual", "Tipo de producto", "Forma"])
+        valor = "etiquetas" if modo_a == "Etiquetas" else "pct"
+        eje_y = "Etiquetas" if valor == "etiquetas" else "% de las altas del año"
+        sub_txt = "Etiquetas que entraron al DSLD cada año" if valor == "etiquetas" else \
+            "% de las etiquetas que entraron al DSLD cada año"
+        campo = {"Estatus actual": "estatus", "Tipo de producto": "tipo", "Forma": "forma"}.get(desglose)
+        denominador = tot_universo.replace(0, pd.NA)
+
+        if campo is None:
+            cuenta = base_a["anio_entrada"].value_counts().reindex(anios, fill_value=0)
+            df = pd.DataFrame({"anio": anios, "etiquetas": cuenta.values})
+            df["pct"] = (df["etiquetas"] / denominador.values * 100).astype(float).fillna(0)
+            df["texto"] = df[valor].map(lambda v: f"{v:,.0f}" if valor == "etiquetas" else (f"{v:.1f} %" if v else "0 %"))
+            base = alt.Chart(df).encode(x=alt.X("anio:O", title=None, axis=alt.Axis(labelAngle=0)))
+            barras = base.mark_bar(color=BLUE).encode(
+                y=alt.Y(f"{valor}:Q", title=eje_y, axis=alt.Axis(format=",d" if valor == "etiquetas" else ".0f")),
+                tooltip=[alt.Tooltip("anio:O", title="Año"), alt.Tooltip("etiquetas:Q", title="Etiquetas", format=","),
+                         alt.Tooltip("pct:Q", title="% de las altas del año", format=".1f")])
+            texto_barras = base.mark_text(dy=-7, color=INK_2, fontSize=11).encode(y=f"{valor}:Q", text="texto:N")
+            mostrar((barras + texto_barras).properties(title=titulo("Altas por año", sub_txt)), 360)
+            tabla_a = df.set_index("anio")[["etiquetas", "pct"]].rename(columns={"etiquetas": "Etiquetas", "pct": "% de las altas del año"})
+        else:
+            d = base_a[["anio_entrada", campo]].copy()
+            if campo == "estatus":
+                orden = ["En mercado", "Descontinuado"]
+                colores_a = ESTATUS_COLORES
+            else:
+                top = d[campo].value_counts().head(5).index.tolist()
+                d[campo] = d[campo].where(d[campo].isin(top), "Otros")
+                orden = top + (["Otros"] if (d[campo] == "Otros").any() else [])
+                azules = [BLUE_DARK, BLUE, BLUE_LIGHT, "#9ec5f4", "#cde2fb"][:len(top)]
+                colores_a = alt.Scale(domain=orden, range=azules + (["#c9c8c3"] if len(orden) > len(top) else []))
+            conteo = d.groupby(["anio_entrada", campo]).size().rename("etiquetas").reset_index()
+            conteo["pct"] = conteo["etiquetas"] / conteo["anio_entrada"].map(tot_universo) * 100
+            barras = alt.Chart(conteo).mark_bar(stroke="white", strokeWidth=1).encode(
+                x=alt.X("anio_entrada:O", title=None, axis=alt.Axis(labelAngle=0)),
+                y=alt.Y(f"{valor}:Q", title=eje_y, stack="zero", axis=alt.Axis(format=",d" if valor == "etiquetas" else ".0f")),
+                color=alt.Color(f"{campo}:N", scale=colores_a, sort=orden, title=None),
+                order=alt.Order(f"{campo}:N", sort="descending"),
+                tooltip=[alt.Tooltip("anio_entrada:O", title="Año"), alt.Tooltip(f"{campo}:N", title=desglose),
+                         alt.Tooltip("etiquetas:Q", title="Etiquetas", format=","),
+                         alt.Tooltip("pct:Q", title="% de las altas del año", format=".1f")])
+            mostrar(barras.properties(title=titulo("Altas por año, desglosadas por " + desglose.lower(), sub_txt)), 360)
+            tabla_a = conteo.pivot_table(index="anio_entrada", columns=campo, values=valor, fill_value=0, observed=True)
+            tabla_a = tabla_a[[c for c in orden if c in tabla_a.columns]]
+            tabla_a.index.name = "anio"
+        with st.expander("Ver tabla"):
+            st.dataframe(tabla_a.round(1), width="stretch")
+        st.caption("Los primeros años (2011-2012) incluyen la carga inicial de la base, y algunos años tienen picos por "
+                   "marcas que suben su catálogo de golpe (por eso conviene dejar activa la exclusión de cargas masivas). "
+                   "El año más reciente puede estar incompleto.")
+
+# =========================================================================================
+# 6. Acerca de
+# =========================================================================================
+if seccion == SECCIONES[5]:
     st.markdown(f"""
 **Datos.** Descarga completa del [DSLD](https://dsld.od.nih.gov/) (NIH, Office of Dietary Supplements),
 enero de 2026: {len(etiquetas):,} etiquetas de todos los tipos de producto. La app abre filtrada a los productos
@@ -558,7 +672,9 @@ el filtro **Tipo de producto** abre el resto.
   En ingredientes no botánicos se conserva *oil* (*fish oil* no se vuelve *fish*).
 - De la lista de ingredientes se quitan las filas de información nutrimental (calorías, grasa total, carbohidratos,
   azúcares…) y los ingredientes con menos de 5 etiquetas no aparecen en la lista desplegable.
-- Las **dosis** son las de la etiqueta por porción; se comparan solo en la unidad más usada del ingrediente.
+- Las **dosis** son las de la etiqueta por porción; se comparan solo en la unidad más usada del ingrediente
+  (la sección *Dosis de referencia* explica cómo se estandarizan).
+- El **año de entrada** (sección *Altas por año*) es el de alta en el DSLD, no el de lanzamiento del producto.
 - Los atributos (*Vegan*, *Organic*…) los declara el fabricante.
 - Son datos de EE. UU.; no equivalen al mercado mexicano.
 """)

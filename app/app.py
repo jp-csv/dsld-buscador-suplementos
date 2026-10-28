@@ -122,36 +122,50 @@ st.sidebar.title("Filtros")
 st.sidebar.caption("Se aplican a todas las secciones. Los nombres están en inglés, como en el DSLD.")
 
 BOTANICOS = [t for t in TIPOS_BOTANICOS if t in TIPO_N.index]
-TODOS = "Todos"
 TIPOS = BOTANICOS + [t for t in TIPO_N.index if t not in BOTANICOS]  # botánicos primero, luego por número de etiquetas
+VISIBLES = 5  # casillas que se ven sin pulsar «Mostrar más»
+
+# La selección vive en `tipos_marcados` (no en las casillas) para que no se pierda cuando las casillas
+# ocultas dejan de dibujarse.
+if "tipos_marcados" not in st.session_state:
+    st.session_state["tipos_marcados"] = list(BOTANICOS)  # por defecto, productos botánicos
 
 
-def _cambio_tipos():
-    """«Todos» marca o desmarca todos los cuadritos; elegir o quitar uno suelta o recompone «Todos»."""
-    ahora, antes = list(st.session_state["tipos_pills"]), st.session_state["tipos_antes"]
-    if TODOS in ahora and TODOS not in antes:
-        ahora = [TODOS] + TIPOS
-    elif TODOS not in ahora and TODOS in antes:
-        ahora = []
-    else:
-        ahora = [t for t in ahora if t != TODOS]
-        if len(ahora) == len(TIPOS):
-            ahora = [TODOS] + ahora
-    st.session_state["tipos_pills"] = ahora
-    st.session_state["tipos_antes"] = ahora
+def _marca_tipo(t):
+    m = set(st.session_state["tipos_marcados"])
+    (m.add if st.session_state[f"cb_{t}"] else m.discard)(t)
+    st.session_state["tipos_marcados"] = [x for x in TIPOS if x in m]
 
 
-if "tipos_pills" not in st.session_state:
-    st.session_state["tipos_pills"] = BOTANICOS  # por defecto, productos botánicos
-    st.session_state["tipos_antes"] = BOTANICOS
+def _marca_todos():
+    st.session_state["tipos_marcados"] = list(TIPOS) if st.session_state["cb_todos"] else []
+
+
+def _ver_mas():
+    st.session_state["tipos_mas"] = not st.session_state.get("tipos_mas", False)
+
+
+_m = set(st.session_state["tipos_marcados"])
+st.session_state["cb_todos"] = len(_m) == len(TIPOS)
+for _t in TIPOS:
+    st.session_state[f"cb_{_t}"] = _t in _m
+
 st.sidebar.markdown("**Tipo de producto**", help="Por defecto se muestran los productos botánicos (herbales). "
-                    "Pulsa los cuadritos para elegir otros tipos; «Todos» los marca o desmarca todos.")
-_marcados = st.sidebar.pills("Tipo de producto", [TODOS] + TIPOS, selection_mode="multi", key="tipos_pills",
-                             on_change=_cambio_tipos, label_visibility="collapsed")
-# Sin selección o con «Todos» no se filtra por tipo.
-sel_tipo = [] if (not _marcados or TODOS in _marcados) else list(_marcados)
-if not _marcados:
-    st.sidebar.caption("Sin ningún tipo elegido se ven todos.")
+                    "Marca otros tipos para sumarlos; «Todos» marca o desmarca todos.")
+st.sidebar.checkbox(f"Todos ({TIPO_N.sum():,})", key="cb_todos", on_change=_marca_todos)
+_ocultos = TIPOS[VISIBLES:]
+_expandido = st.session_state.get("tipos_mas", False) or any(t in _m for t in _ocultos)
+for _t in TIPOS[:VISIBLES] + (_ocultos if _expandido else []):
+    st.sidebar.checkbox(f"{_t} ({TIPO_N[_t]:,})", key=f"cb_{_t}", on_change=_marca_tipo, args=(_t,))
+if _ocultos:
+    if not _expandido:
+        st.sidebar.button(f"Mostrar {len(_ocultos)} más ⌄", key="btn_mas", type="tertiary", on_click=_ver_mas)
+    elif st.session_state.get("tipos_mas", False):
+        st.sidebar.button("Mostrar menos ⌃", key="btn_mas", type="tertiary", on_click=_ver_mas)
+# Sin ninguno marcado, o con todos, no se filtra por tipo.
+sel_tipo = [] if (not _m or len(_m) == len(TIPOS)) else list(st.session_state["tipos_marcados"])
+if not _m:
+    st.sidebar.caption("Sin ningún tipo marcado se ven todos.")
 sel_ing = st.sidebar.multiselect(
     "Ingrediente", ING_N.index.tolist(), format_func=lambda n: f"{n} ({ING_N[n]:,})",
     placeholder="Escribe para buscar, p. ej. turmeric", select_all=False)

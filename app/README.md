@@ -16,7 +16,7 @@ Los filtros de la barra lateral se aplican a todas las secciones (en *Comparar m
 
 ## Detalles
 
-- **Tipo de producto:** son cuadritos seleccionables; *Todos* marca o desmarca todos de golpe, y sin ninguno elegido se ven todos los tipos. Con tipos distintos de botánico, «Con qué se combina» y los mapas pasan solos a incluir vitaminas y minerales.
+- **Tipo de producto:** es una lista de casillas; *Todos* marca o desmarca todas de golpe, «Mostrar más» despliega los tipos restantes, y sin ninguna marcada se ven todos los tipos. Con tipos distintos de botánico, «Con qué se combina» y los mapas pasan solos a incluir vitaminas y minerales.
 - **Variantes del nombre:** con la casilla activada, «turmeric» también incluye «turmeric co2», «turmeric 95»… (nombres que contienen esa palabra completa).
 - **Dosis:** una por etiqueta (si se repite, la mediana), en la unidad más usada del ingrediente; la masa se muestra en mg o mcg según el tamaño típico. Vitamina D: IU convertidas a mcg. IU de A y E, mL y CFU no se mezclan con masas. Arriba de la gráfica se indica cuántas etiquetas entran, cuántas usan otra unidad y cuántas no declaran cantidad; el detalle del método está en la sección *Dosis de referencia*.
 - **Lista de ingredientes:** solo aparecen los que tienen al menos 5 etiquetas.

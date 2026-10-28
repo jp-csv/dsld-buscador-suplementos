@@ -122,16 +122,36 @@ st.sidebar.title("Filtros")
 st.sidebar.caption("Se aplican a todas las secciones. Los nombres están en inglés, como en el DSLD.")
 
 BOTANICOS = [t for t in TIPOS_BOTANICOS if t in TIPO_N.index]
-if "sel_tipo" not in st.session_state:
-    st.session_state["sel_tipo"] = BOTANICOS  # por defecto, productos botánicos
-sel_tipo = st.sidebar.multiselect(
-    "Tipo de producto", TIPO_N.index.tolist(), key="sel_tipo",
-    format_func=lambda n: f"{n} ({TIPO_N[n]:,})", placeholder="Todos los tipos", select_all=False,
-    help="Por defecto se muestran los productos botánicos (herbales). Elige otros tipos (vitaminas, minerales, "
-         "aminoácidos…) o usa los botones de abajo. Sin ninguna opción elegida se ven todos los tipos.")
-_b1, _b2 = st.sidebar.columns(2)
-_b1.button("Todos", on_click=lambda: st.session_state.update(sel_tipo=[]), width="stretch")
-_b2.button("Botánicos", on_click=lambda: st.session_state.update(sel_tipo=BOTANICOS), width="stretch")
+TODOS = "Todos"
+TIPOS = BOTANICOS + [t for t in TIPO_N.index if t not in BOTANICOS]  # botánicos primero, luego por número de etiquetas
+
+
+def _cambio_tipos():
+    """«Todos» marca o desmarca todos los cuadritos; elegir o quitar uno suelta o recompone «Todos»."""
+    ahora, antes = list(st.session_state["tipos_pills"]), st.session_state["tipos_antes"]
+    if TODOS in ahora and TODOS not in antes:
+        ahora = [TODOS] + TIPOS
+    elif TODOS not in ahora and TODOS in antes:
+        ahora = []
+    else:
+        ahora = [t for t in ahora if t != TODOS]
+        if len(ahora) == len(TIPOS):
+            ahora = [TODOS] + ahora
+    st.session_state["tipos_pills"] = ahora
+    st.session_state["tipos_antes"] = ahora
+
+
+if "tipos_pills" not in st.session_state:
+    st.session_state["tipos_pills"] = BOTANICOS  # por defecto, productos botánicos
+    st.session_state["tipos_antes"] = BOTANICOS
+st.sidebar.markdown("**Tipo de producto**", help="Por defecto se muestran los productos botánicos (herbales). "
+                    "Pulsa los cuadritos para elegir otros tipos; «Todos» los marca o desmarca todos.")
+_marcados = st.sidebar.pills("Tipo de producto", [TODOS] + TIPOS, selection_mode="multi", key="tipos_pills",
+                             on_change=_cambio_tipos, label_visibility="collapsed")
+# Sin selección o con «Todos» no se filtra por tipo.
+sel_tipo = [] if (not _marcados or TODOS in _marcados) else list(_marcados)
+if not _marcados:
+    st.sidebar.caption("Sin ningún tipo elegido se ven todos.")
 sel_ing = st.sidebar.multiselect(
     "Ingrediente", ING_N.index.tolist(), format_func=lambda n: f"{n} ({ING_N[n]:,})",
     placeholder="Escribe para buscar, p. ej. turmeric", select_all=False)

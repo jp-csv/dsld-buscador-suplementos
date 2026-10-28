@@ -22,7 +22,7 @@
 
 ## La app
 
-Pensada para **desarrollo de producto**. La app abre con los productos **botánicos** (*Botanical* y *Botanical with Nutrients*, 67,449 etiquetas); el filtro **Tipo de producto** abre el resto (con los botones *Todos* y *Botánicos* para cambiar rápido; vitaminas, minerales, aminoácidos, grasas, otras combinaciones…). Los filtros de la barra lateral (tipo, ingrediente, palabra del título, marca, forma, atributos, estatus y año) se aplican a cinco secciones:
+Pensada para **desarrollo de producto**. La app abre con los productos **botánicos** (*Botanical* y *Botanical with Nutrients*, 67,449 etiquetas); el filtro **Tipo de producto** abre el resto (con cuadritos seleccionables y un cuadrito *Todos* que marca o desmarca todos; vitaminas, minerales, aminoácidos, grasas, otras combinaciones…). Los filtros de la barra lateral (tipo, ingrediente, palabra del título, marca, forma, atributos, estatus y año) se aplican a cinco secciones:
 
 - **Buscador:** indicadores, formas, marcas, con qué se combina, atributos declarados, dosis y palabras de los títulos, más la lista de productos con link a la etiqueta original y descarga en CSV.
 - **Dosis de referencia:** rango de dosis declaradas de un ingrediente por forma (P10, Q1, mediana, Q3, P90), en la unidad más usada del ingrediente.

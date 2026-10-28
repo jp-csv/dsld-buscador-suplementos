@@ -1,4 +1,4 @@
-# Buscador de suplementos (DSLD) · Dietary supplement label search
+# Buscador de etiquetas de suplementos (DSLD) · Dietary supplement label search
 
 **English summary.** An interactive **Streamlit app** to search the NIH [Dietary Supplement Label Database (DSLD)](https://dsld.od.nih.gov/): **214,780 U.S. supplement labels** of every product type. It opens filtered to botanical (herbal) products and a filter lets you switch to vitamins, minerals, amino acids, fats and the rest. Built for product developers: search by ingredient, title keyword, brand, form or label claim (vegan, organic…), get reference dose ranges by form, spot ingredient × form gaps and compare brands. Built with Python, pandas, Altair and Streamlit.
 

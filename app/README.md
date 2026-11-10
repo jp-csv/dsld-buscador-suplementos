@@ -1,6 +1,6 @@
 # App · Buscador de suplementos
 
-App de Streamlit para explorar las 214,780 etiquetas del DSLD, pensada para **desarrollo de producto**. Abre filtrada a los productos botánicos (herbales); el filtro **Tipo de producto** permite ver el resto.
+App de Streamlit para explorar las 214,780 etiquetas del DSLD, pensada para **desarrollo de producto**. Abre con todos los tipos de producto; el filtro **Tipo de producto** permite acotar (p. ej. solo botánicos).
 
 ![Buscador](capturas/buscador.png)
 
@@ -16,20 +16,22 @@ Los filtros de la barra lateral se aplican a todas las secciones (en *Comparar m
 
 ## Detalles
 
-- **Tipo de producto:** es una lista de casillas; *Todos* marca o desmarca todas de golpe, «Mostrar más» despliega los tipos restantes, y sin ninguna marcada se ven todos los tipos. Con tipos distintos de botánico, «Con qué se combina» y los mapas pasan solos a incluir vitaminas y minerales.
+- **Tipo de producto:** es una lista de casillas; *Todos* marca o desmarca todas de golpe, «Mostrar más» despliega los tipos restantes, y sin ninguna marcada se ven todos los tipos. Por defecto están todos marcados, y la exclusión de marcas de carga masiva está desactivada. Con tipos distintos de botánico, «Con qué se combina» y los mapas pasan solos a incluir vitaminas y minerales.
+- **Término en el nombre original del ingrediente:** busca palabras (*extract*, *powder*, *co2*, *95 %*) dentro de cómo escribió el ingrediente cada etiqueta, antes de agrupar. Sirve para separar lo que el agrupado junta (en botánicos, extracto y polvo cuentan como el mismo ingrediente). Se combina con el ingrediente elegido y también afecta la dosis.
 - **Variantes del nombre:** con la casilla activada, «turmeric» también incluye «turmeric co2», «turmeric 95»… (nombres que contienen esa palabra completa).
 - **Dosis:** una por etiqueta (si se repite, la mediana), en la unidad más usada del ingrediente; la masa se muestra en mg o mcg según el tamaño típico. Vitamina D: IU convertidas a mcg. IU de A y E, mL y CFU no se mezclan con masas. Arriba de la gráfica se indica cuántas etiquetas entran, cuántas usan otra unidad y cuántas no declaran cantidad; el detalle del método está en la sección *Dosis de referencia*.
 - **Lista de ingredientes:** solo aparecen los que tienen al menos 5 etiquetas.
-- **Cargas masivas:** por defecto se excluyen TerraVita Premium Collection, TerraVita, Herbal Terra y Hawaii Pharm.
+- **Cargas masivas:** hay una casilla (desactivada por defecto) para excluir TerraVita Premium Collection, TerraVita, Herbal Terra y Hawaii Pharm.
 - En listas muy grandes, las palabras de los títulos se calculan con una muestra de 30,000 etiquetas. La tabla muestra hasta 1,000 productos; la descarga trae todos.
 
 ## Datos
 
-`datos/` contiene tres archivos Parquet (~19 MB) generados con `utilidades/preparar_datos.py`:
+`datos/` contiene tres archivos Parquet y una tabla de auditoría (~26 MB), generados con `utilidades/preparar_datos.py`:
 
 - `etiquetas.parquet`: una fila por etiqueta (producto, marca, tipo, forma, estatus, año de entrada, porción, contenido, link, si tiene mezcla).
 - `ingredientes.parquet`: una fila por ingrediente declarado (nombre original y limpio, categoría, valor y unidad).
 - `atributos.parquet`: una fila por etiqueta y atributo declarado (del JSON del DSLD).
+- `agrupaciones.csv`: tabla de auditoría (la app no la lee): cada nombre original, a qué ingrediente se agrupó y con qué regla. Ver `METODOLOGIA.md` en la raíz.
 
 ## Correrla en local
 

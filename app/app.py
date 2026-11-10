@@ -4,12 +4,13 @@ Buscador de suplementos (DSLD, NIH).
 App de Streamlit para explorar las etiquetas del Dietary Supplement Label Database:
 buscar por tipo de producto, ingrediente, palabra del título, marca, forma o atributo, y ver
 gráficas, dosis de referencia, huecos de mercado y comparaciones entre marcas.
-Por defecto muestra los productos botánicos (herbales); el filtro «Tipo de producto» abre el resto.
+Por defecto muestra todos los tipos de producto; el filtro «Tipo de producto» permite acotarlos (p. ej. solo botánicos).
 """
 import re
 from pathlib import Path
 
 import altair as alt
+import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -128,7 +129,7 @@ VISIBLES = 5  # casillas que se ven sin pulsar «Mostrar más»
 # La selección vive en `tipos_marcados` (no en las casillas) para que no se pierda cuando las casillas
 # ocultas dejan de dibujarse.
 if "tipos_marcados" not in st.session_state:
-    st.session_state["tipos_marcados"] = list(BOTANICOS)  # por defecto, productos botánicos
+    st.session_state["tipos_marcados"] = list(TIPOS)  # por defecto, todos los tipos
 
 
 def _marca_tipo(t):
@@ -150,8 +151,8 @@ st.session_state["cb_todos"] = len(_m) == len(TIPOS)
 for _t in TIPOS:
     st.session_state[f"cb_{_t}"] = _t in _m
 
-st.sidebar.markdown("**Tipo de producto**", help="Por defecto se muestran los productos botánicos (herbales). "
-                    "Marca otros tipos para sumarlos; «Todos» marca o desmarca todos.")
+st.sidebar.markdown("**Tipo de producto**", help="Por defecto están todos marcados. Desmarca «Todos» y elige los que quieras (p. ej. solo "
+                    "Botánico y Botánico con nutrientes).")
 st.sidebar.checkbox(f"Todos ({TIPO_N.sum():,})", key="cb_todos", on_change=_marca_todos)
 _ocultos = TIPOS[VISIBLES:]
 _expandido = st.session_state.get("tipos_mas", False) or any(t in _m for t in _ocultos)
@@ -171,6 +172,11 @@ sel_ing = st.sidebar.multiselect(
     placeholder="Escribe para buscar, p. ej. turmeric", select_all=False)
 variantes = st.sidebar.checkbox("Incluir variantes del nombre", value=True,
                                 help="Con «turmeric» también cuenta «turmeric co2», «turmeric 95 %», «organic turmeric root»…")
+termino_ing = st.sidebar.text_input(
+    "Término en el nombre original del ingrediente", placeholder="p. ej. co2, 95%, extract, powder",
+    help="Busca dentro de cómo escribió el ingrediente cada etiqueta (el nombre original, antes de agrupar). Así se "
+         "distingue lo que el agrupado junta: «turmeric extract» ≠ «turmeric powder». Con varias palabras deben estar "
+         "todas. Si elegiste un ingrediente, se aplica a ese ingrediente; si no, a cualquiera de la etiqueta.")
 modo_ing = "todos"
 if len(sel_ing) > 1:
     modo_ing = st.sidebar.radio("La etiqueta debe tener", ["todos", "al menos uno"], horizontal=True)
@@ -187,7 +193,7 @@ anio_min, anio_max = int(etiquetas["anio_entrada"].min()), int(etiquetas["anio_e
 sel_anios = st.sidebar.slider("Año de entrada al DSLD", anio_min, anio_max, (anio_min, anio_max),
                               help="Fecha en que se capturó la etiqueta, no de lanzamiento.")
 excluir_masiva = st.sidebar.checkbox(
-    "Excluir marcas de carga masiva", value=True,
+    "Excluir marcas de carga masiva", value=False,
     help="TerraVita Premium Collection, TerraVita, Herbal Terra y Hawaii Pharm subieron miles de etiquetas de golpe.")
 
 
@@ -201,8 +207,39 @@ def nombres_de(nombre):
     return NOMBRES[NOMBRES.str.contains(r"(?<!\w)" + re.escape(nombre) + r"(?!\w)", regex=True)].tolist()
 
 
+@st.cache_resource
+def originales_en_minusculas():
+    o = pd.Series(ingredientes["original"].cat.categories.astype(str))
+    return o, o.str.lower()
+
+
+def originales_con_termino():
+    """Nombres originales que contienen todas las palabras del término (None si no hay término)."""
+    palabras_t = termino_ing.lower().split()
+    if not palabras_t:
+        return None
+    o, bajo = originales_en_minusculas()
+    ok = pd.Series(True, index=o.index)
+    for w in palabras_t:
+        ok &= bajo.str.contains(w, regex=False)
+    return o[ok].tolist()
+
+
+COINCIDEN = originales_con_termino()
+
+
+def con_termino(filas):
+    """Deja solo las filas de ingrediente cuyo nombre original contiene el término (si hay término)."""
+    return filas if COINCIDEN is None else filas[filas["original"].isin(COINCIDEN)]
+
+
+def filas_de(nombre, filas=None):
+    f = ingredientes if filas is None else filas
+    return con_termino(f[f["ingrediente"].isin(nombres_de(nombre))])
+
+
 def ids_de_ingrediente(nombre):
-    return set(ingredientes.loc[ingredientes["ingrediente"].isin(nombres_de(nombre)), "dsld_id"].unique())
+    return set(filas_de(nombre)["dsld_id"].unique())
 
 
 def filtrar(con_marca=True, con_anio=True):
@@ -215,6 +252,8 @@ def filtrar(con_marca=True, con_anio=True):
         conjuntos = [ids_de_ingrediente(n_) for n_ in sel_ing]
         ids = set.intersection(*conjuntos) if modo_ing == "todos" else set.union(*conjuntos)
         e = e[e["dsld_id"].isin(ids)]
+    elif COINCIDEN is not None:
+        e = e[e["dsld_id"].isin(ingredientes.loc[ingredientes["original"].isin(COINCIDEN), "dsld_id"].unique())]
     if texto.strip():
         patron = r"\b" + re.escape(texto.strip().lower()) + r"\b"
         e = e[e["producto"].str.lower().str.contains(patron, regex=True)]
@@ -242,8 +281,8 @@ ids_sub = set(sub["dsld_id"])
 ing_sub = ingredientes[ingredientes["dsld_id"].isin(ids_sub)]
 
 st.title("Buscador de suplementos")
-st.caption("Etiquetas del Dietary Supplement Label Database (DSLD, NIH). Por defecto: productos botánicos (herbales); "
-           "cambia el filtro «Tipo de producto» para ver el resto. Los conteos son de etiquetas, no de productos distintos.")
+st.caption("Etiquetas del Dietary Supplement Label Database (DSLD, NIH). Por defecto se ven todos los tipos de producto "
+           "(filtra por «Tipo de producto» si solo quieres, p. ej., botánicos). Los conteos son de etiquetas, no de productos distintos.")
 
 SECCIONES = ["🔎 Buscador", "💊 Dosis de referencia", "🧩 Huecos de mercado", "⚖️ Comparar marcas", "📈 Altas por año",
              "ℹ️ Acerca de"]
@@ -344,10 +383,28 @@ if seccion == SECCIONES[0]:
         c1.metric("Etiquetas", f"{n:,}", help="Etiquetas que cumplen los filtros")
         c1.caption(f"{pct(n / len(universo))} de las etiquetas " + ("de los tipos elegidos" if sel_tipo else "de toda la base")
                    + (" (sin cargas masivas)" if excluir_masiva else ""))
+        if COINCIDEN is not None:
+            c1.caption(f"Término «{termino_ing}»: {len(COINCIDEN):,} nombres originales coinciden.")
         c2.metric("Marcas distintas", f"{sub['marca'].nunique():,}")
         c3.metric("Siguen en el mercado", pct((sub["estatus"] == "En mercado").mean()))
         c4.metric("Tienen una mezcla", pct(sub["tiene_mezcla"].mean()),
                   help="Al menos un ingrediente de categoría *blend* (mezcla propietaria o complejo con nombre comercial)")
+
+        if sel_ing:
+            with st.expander("¿Qué nombres de las etiquetas cuentan como este ingrediente?"):
+                st.caption("Cada etiqueta escribe el ingrediente a su manera. Aquí están los nombres originales que se "
+                           "agruparon bajo lo que buscaste (dentro de los filtros). Si falta uno que debería estar, o sobra "
+                           "uno que no, es un error de agrupación: apúntalo. El método está en «Acerca de».")
+                for ing_o in sel_ing[:3]:
+                    filas_o = filas_de(ing_o, ing_sub)[["dsld_id", "original", "ingrediente"]]
+                    filas_o = filas_o.astype({"original": str, "ingrediente": str}).drop_duplicates(["dsld_id", "original"])
+                    tabla_o = (filas_o.groupby(["ingrediente", "original"]).size().rename("Etiquetas").reset_index()
+                               .sort_values("Etiquetas", ascending=False))
+                    st.markdown(f"**{ing_o}**: {len(tabla_o):,} nombres originales distintos en "
+                                f"{filas_o['dsld_id'].nunique():,} etiquetas" + (" (se muestran 50)" if len(tabla_o) > 50 else ""))
+                    st.dataframe(tabla_o.head(50).rename(columns={"ingrediente": "Se cuenta como",
+                                                                  "original": "Nombre en la etiqueta"}),
+                                 hide_index=True, width="stretch")
 
         col1, col2 = st.columns(2)
         with col1:
@@ -380,7 +437,7 @@ if seccion == SECCIONES[0]:
         col1, col2 = st.columns(2)
         with col1:
             if len(sel_ing) == 1:
-                dosis, u_dosis, cob = dosis_por_etiqueta(ing_sub[ing_sub["ingrediente"].isin(nombres_de(sel_ing[0]))])
+                dosis, u_dosis, cob = dosis_por_etiqueta(filas_de(sel_ing[0], ing_sub))
                 if len(dosis) >= 10:
                     tope = dosis.quantile(0.95)
                     df = dosis[dosis <= tope].rename("dosis").reset_index()
@@ -454,7 +511,7 @@ if seccion == SECCIONES[1]:
         "ashwagandha" if "ashwagandha" in opciones_dosis else opciones_dosis[0])
     ing_d = st.selectbox("Ingrediente", opciones_dosis, index=opciones_dosis.index(defecto),
                          format_func=lambda x: f"{x} ({ING_N[x]:,})")
-    filas = ingredientes[ingredientes["ingrediente"].isin(nombres_de(ing_d)) & ingredientes["dsld_id"].isin(ids_sub)]
+    filas = filas_de(ing_d, ingredientes[ingredientes["dsld_id"].isin(ids_sub)])
     dosis, u_dosis, cob = dosis_por_etiqueta(filas)
     if u_dosis:
         st.caption(texto_cobertura(cob, u_dosis))
@@ -681,29 +738,66 @@ if seccion == SECCIONES[4]:
         with st.expander("Ver tabla"):
             st.dataframe(tabla_a.round(1), width="stretch")
         st.caption("Los primeros años (2011-2012) incluyen la carga inicial de la base, y algunos años tienen picos por "
-                   "marcas que suben su catálogo de golpe (por eso conviene dejar activa la exclusión de cargas masivas). "
+                   "marcas que suben su catálogo de golpe (por eso puede convenir activar la exclusión de cargas masivas). "
                    "El año más reciente puede estar incompleto.")
 
+EXPLICACION_AGRUPACION = """
+Las etiquetas escriben el mismo ingrediente de muchas formas (en la base completa hay **76,390 nombres originales**).
+Para poder buscarlos y contarlos se agrupan en tres capas, en este orden. Quedan **39,755 ingredientes**.
+
+**1. Limpieza de ruido** (`utilidades/calificadores.csv`). Minúsculas; se quita lo que va entre paréntesis y los signos
+raros; se quitan palabras que no cambian el ingrediente (*organic*, *powder*, *anhydrous*, *micronized*, *total*…).
+En ingredientes **botánicos** también se quitan las partes de la planta y la forma de extracción (*root*, *leaf*,
+*extract*, *liquid*, *CO2*, razones como *10:1*…). En aminoácidos se unifica la sal clorhidrato (*L-lysine HCl* = *L-lysine*)
+y en bacterias la abreviatura del género (*L. acidophilus* = *Lactobacillus acidophilus*). En los no botánicos se
+conserva *oil* (*fish oil* no se vuelve *fish*). La lista de palabras **no se eligió a mano al azar**: sale de revisar
+los 1,000 ingredientes más comunes (85 % de todas las filas), contando qué palabras sobran con más frecuencia
+(`utilidades/candidatos_calificadores.py`). Cada palabra revisada tiene su decisión y su motivo, incluidas las que
+**no** se fusionan (sales como *citrate* u *oxide*, marcas, variedades como *red* o *wild*).
+
+**2. Sinónimos** (`utilidades/sinonimos.csv`, 94 reglas). Son casos donde el mismo compuesto o planta tiene nombres muy
+distintos. Cada regla tiene un **criterio** escrito: *A* misma molécula (ortografía o marca de la misma molécula),
+*B* nombre común = nombre científico en plantas y hongos (*ginkgo* = *ginkgo biloba*; *turmeric* = *curcuma longa*),
+*C* familia NAD+, *D* las 13 vitaminas esenciales, *E* siglas (*GABA*, *MSM*, *PABA*, *DIM*…). Se llegó a ellas
+revisando los ingredientes más comunes uno por uno, no solo los que se me ocurrieron.
+
+**3. Comparación automática de escritura.** Para cada nombre se calcula una *clave*: se ignoran guiones, signos + y /,
+el prefijo *l-* y el orden de las palabras (*L-glutamine* = *glutamine*; *Lactobacillus acidophilus* = *acidophilus
+Lactobacillus*). Se muestra el nombre más frecuente del grupo. No se quitan *dl-* ni *d-* (pueden ser mezclas o formas
+distintas).
+
+**Limitaciones.**
+- **Extracto ≠ polvo.** En botánicos, *turmeric extract*, *turmeric powder* y *turmeric root* se cuentan juntos como
+  *turmeric*: son preparaciones distintas, pero agruparlas permite contar «cuántos productos llevan cúrcuma». Para
+  separarlas usa el filtro **«Término en el nombre original del ingrediente»** (p. ej. `extract`, `powder`, `co2`, `95%`),
+  que busca en lo que escribió la etiqueta, antes de agrupar.
+- No se fusionan sales o ésteres distintos (citrato, óxido, bitartrato…) porque la dosis es de la sal y a veces cambia el
+  producto (betaína HCl ≠ betaína anhidra); tampoco marcas, cepas ni especies distintas (ginseng americano ≠ asiático).
+- Lo que no está en las tablas no se agrupa: *curcumin* y *curcuminoids* quedan separados, igual que marcas como
+  *Kaneka ubiquinol*. Los ingredientes poco comunes (fuera del top 1,000) se revisaron menos.
+La tabla completa nombre original → ingrediente está en `app/datos/agrupaciones.csv`.
+"""
+
 # =========================================================================================
-# 6. Acerca de
+# 7. Acerca de
 # =========================================================================================
 if seccion == SECCIONES[5]:
     st.markdown(f"""
 **Datos.** Descarga completa del [DSLD](https://dsld.od.nih.gov/) (NIH, Office of Dietary Supplements),
-enero de 2026: {len(etiquetas):,} etiquetas de todos los tipos de producto. La app abre filtrada a los productos
-botánicos (*Botanical* y *Botanical with Nutrients*, {int(TIPO_N.reindex(TIPOS_BOTANICOS).sum()):,} etiquetas);
-el filtro **Tipo de producto** abre el resto.
+enero de 2026: {len(etiquetas):,} etiquetas de todos los tipos de producto. La app abre con todos los tipos y sin
+filtros; el filtro **Tipo de producto** permite acotar (p. ej. solo botánicos: *Botanical* y *Botanical with Nutrients*,
+{int(TIPO_N.reindex(TIPOS_BOTANICOS).sum()):,} etiquetas).
 
 **Cómo leerlo**
 - Los datos son lo **declarado en la etiqueta**; el NIH no verifica su exactitud.
 - Se cuentan **etiquetas**, no productos distintos: una misma presentación puede tener varias (tamaños, sabores).
 - El **año de entrada** es cuando se capturó la etiqueta en el DSLD, no cuando salió al mercado.
 - Cuatro marcas (TerraVita Premium Collection, TerraVita, Herbal Terra y Hawaii Pharm) subieron miles de etiquetas
-  de golpe; por defecto se excluyen.
-- Los nombres de ingredientes se **limpian** de forma aproximada (minúsculas, sin paréntesis ni palabras como
-  *organic*, *extract* o *root*): *turmeric root extract* cuenta como *turmeric*. Las vitaminas con varios nombres
-  se agrupan (*ascorbic acid* y *vitamin C* son «vitamin c (ascorbic acid)»; *cholecalciferol* y *vitamin D3*, «vitamin d»).
-  En ingredientes no botánicos se conserva *oil* (*fish oil* no se vuelve *fish*).
+  de golpe; hay una casilla para excluirlas (por defecto no se excluyen).
+- Los nombres de ingredientes se **normalizan en tres capas** (detalle abajo): una limpieza de ruido, una tabla de
+  sinónimos y una comparación automática de escritura. Es un método por reglas, no perfecto.
+- En botánicos el **extracto y el polvo de la planta se cuentan juntos**; para separarlos usa el filtro «Término en el
+  nombre original del ingrediente».
 - De la lista de ingredientes se quitan las filas de información nutrimental (calorías, grasa total, carbohidratos,
   azúcares…) y los ingredientes con menos de 5 etiquetas no aparecen en la lista desplegable.
 - Las **dosis** son las de la etiqueta por porción; se comparan solo en la unidad más usada del ingrediente
@@ -712,3 +806,5 @@ el filtro **Tipo de producto** abre el resto.
 - Los atributos (*Vegan*, *Organic*…) los declara el fabricante.
 - Son datos de EE. UU.; no equivalen al mercado mexicano.
 """)
+    with st.expander("Cómo se agrupan los nombres de ingredientes"):
+        st.markdown(EXPLICACION_AGRUPACION)

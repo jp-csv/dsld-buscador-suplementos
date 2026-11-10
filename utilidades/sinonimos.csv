@@ -1,0 +1,95 @@
+grupo,patron,nota,criterio
+vitamin a (retinol),vitamin a|retinol|retinyl.*|vitamin a palmitate,Vitamina A preformada; el beta-caroteno NO se incluye,D: vitaminas esenciales (una fila por vitamina)
+vitamin c (ascorbic acid),vitamin c|ascorb.*|calcium ascorbate|sodium ascorbate,Ácido ascórbico y sus sales,D: vitaminas esenciales (una fila por vitamina)
+vitamin d (cholecalciferol),vitamin d\d?|vitamin d-\d|cholecalciferol|ergocalciferol,D2 y D3 juntas; sus IU se convierten a mcg,D: vitaminas esenciales (una fila por vitamina)
+vitamin e (tocopherol),(?!.*tocotrienol)(vitamin e|(d|dl|d-alpha|dl-alpha|alpha)?[- ]?tocopher.*|mixed tocopherols),Tocoferoles; los tocotrienoles quedan aparte,D: vitaminas esenciales (una fila por vitamina)
+vitamin k,vitamin k\d?|vitamin k-\d|menaquinone.*|phylloquinone,K1 y K2 juntas,D: vitaminas esenciales (una fila por vitamina)
+thiamin (vitamin b1),vitamin b-?1|thiamin|thiamine.*,,D: vitaminas esenciales (una fila por vitamina)
+riboflavin (vitamin b2),vitamin b-?2|riboflavin.*,,D: vitaminas esenciales (una fila por vitamina)
+niacin (vitamin b3),vitamin b-?3|niacin|niacinamide|nicotinamide|inositol hexanicotinate,Niacina y niacinamida juntas,D: vitaminas esenciales (una fila por vitamina)
+pantothenic acid (vitamin b5),vitamin b-?5|pantothenic acid|calcium pantothenate|d-calcium pantothenate,,D: vitaminas esenciales (una fila por vitamina)
+vitamin b6 (pyridoxine),vitamin b-?6|pyridox.*,,D: vitaminas esenciales (una fila por vitamina)
+biotin (vitamin b7),vitamin b-?7|biotin,,D: vitaminas esenciales (una fila por vitamina)
+folate (vitamin b9),vitamin b-?9|folate|folic acid|l-?methylfolate|methylfolate|5-mthf|l-?5-?(mthf|methyltetrahydrofolate)|5-methyltetrahydrofolate|quatrefolic,"Folato, ácido fólico y metilfolato juntos",D: vitaminas esenciales (una fila por vitamina)
+vitamin b12 (cobalamin),vitamin b-?12|cobalamin|cyanocobalamin|methylcobalamin|hydroxocobalamin,,D: vitaminas esenciales (una fila por vitamina)
+nadh (reduced nad+),(.+ )?nadh( complex)?|(beta-|b-)?nicotinamide adenine dinucleotide( (hydride|hydrogen|reduced|disodium))+|reduced (beta-|b-)?nicotinamide adenine dinucleotide.*,Forma reducida de NAD+,C: familia NAD+ (caso que originó la revisión)
+nad+ (nicotinamide adenine dinucleotide),nad( trihydrate)?|(beta-|b-)?nicotinamide adenine dinucleotide( sodium)?,NAD+ escrito de varias formas; las fórmulas con nombre comercial («NAD+ Complete») no se tocan,C: familia NAD+ (caso que originó la revisión)
+"nmn (nicotinamide mononucleotide, nad+ precursor)",(beta-)?nicotinamide mononucleotide( powder)?|(.+ )?nmn,Precursor de NAD+,C: familia NAD+ (caso que originó la revisión)
+"nicotinamide riboside (nr, nad+ precursor)",(niagen )?nicotinamide riboside( chloride| hydrogen malate)?|niagen,Precursor de NAD+ (Niagen es su marca),C: familia NAD+ (caso que originó la revisión)
+coenzyme q10 (ubiquinone),(.+ )?(co-?enzyme[ -]?q[ -]?10|coq[ -]?10)|ubiquinone|q10,CoQ10 oxidada; la ubiquinol (reducida) queda aparte,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+ubiquinol (reduced coq10),(.+ )?ubiquinol( qh)?,CoQ10 reducida,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+alpha-lipoic acid,(dl-)?(alpha-)?lipoic acid,El ALA estándar es la mezcla racémica (dl); las formas R- quedan aparte,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+n-acetyl cysteine (nac),nac|n[- ]acetyl[- ](l[- ])?cysteine,No incluye NAC amida,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+5-htp (5-hydroxytryptophan),(l-)?5[- ]htp|(l-)?5[- ]hydroxytryptophan,,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+dha (docosahexaenoic acid),dha|docosahexaenoic acid,Los ésteres etílicos quedan aparte,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+epa (eicosapentaenoic acid),epa|eicosapentaenoic acid,Los ésteres etílicos quedan aparte,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+hyaluronic acid,hyaluronic acid|sodium hyaluronate|hyaluronan,,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+l-theanine,(l-)?theanine|suntheanine( l-theanine)?|l-theanine suntheanine|theapure( l-theanine)?,Suntheanine y Theapure son marcas de L-teanina,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+glucosamine hcl,glucosamine (hcl|hydrochloride),El sulfato de glucosamina queda aparte,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+ashwagandha,(ksm-66|sensoril) ashwagandha|ksm-66,KSM-66 y Sensoril son marcas de extracto de ashwagandha,"A: misma molécula (ortografía, sigla, marca de la misma molécula)"
+gaba (gamma-aminobutyric acid),gaba|gamma-aminobutyric acid|4-aminobutyric acid,,E: sigla y nombre químico del mismo compuesto
+msm (methylsulfonylmethane),msm|methylsulfonylmethane|dimethyl sulfone,,E: sigla y nombre químico del mismo compuesto
+paba (para-aminobenzoic acid),paba|para-aminobenzoic acid|p-aminobenzoic acid|4-aminobenzoic acid|aminobenzoic acid,,E: sigla y nombre químico del mismo compuesto
+alpha-gpc (alpha-glycerylphosphorylcholine),alpha[- ]gpc|(l-)?alpha-glycerylphosphorylcholine|choline alfoscerate,,E: sigla y nombre químico del mismo compuesto
+dim (diindolylmethane),dim|diindolylmethane,,E: sigla y nombre químico del mismo compuesto
+glutathione,(reduced )?(l-)?glutathione,,A: misma molécula
+phosphatidylserine,phosphatidyl[- ]?serine( complex)?,,A: misma molécula (ortografía)
+phosphatidylcholine,phosphatidyl[- ]?choline( complex)?,,A: misma molécula (ortografía)
+acetyl-l-carnitine (alcar),(n-)?acetyl[- ]l?-?carnitine( hcl)?|alcar,,A: misma molécula (la sal HCl se trata como la misma); la L-carnitina simple queda aparte
+omega-3 fatty acids,omega-3( fatty acids?)?,"""Other omega-3"" (sin EPA/DHA) queda aparte",A: misma categoría nutricional
+collagen (hydrolyzed / peptides),(hydrolyzed )?collagen( peptides?| hydrolysate)?( hydrolyzed)?|collagen hydrolysate|hydrolyzed collagen peptides?,"No distingue origen (bovino, marino); eso se busca por término",A: misma molécula (hidrolizado = péptidos de colágeno)
+citrus bioflavonoids,((mixed )?(citrus|lemon) )?bioflavonoids?( complex)?,,A: mismo tipo de ingrediente (bioflavonoides cítricos)
+hesperidin,hesperidin( complex)?,La hesperidina metil chalcona queda aparte,A: misma molécula
+resveratrol,(resvida |natural )?(trans-)?resveratrol( complex)?,Trans-resveratrol y marca Resvida incluidos,A: misma molécula (isómero activo y marca)
+lutein,(lutemax( 2020)?|floraglo|free |trans-)?\s?lutein,Lutemax y FloraGLO son marcas de luteína,A: misma molécula (marcas)
+chondroitin sulfate,chondroitin( sulfate)?( sodium)?|sodium chondroitin sulfate,,A: misma molécula (sal sódica)
+glucosamine sulfate,glucosamine sulfate( 2kcl| 2nacl| potassium chloride| sodium chloride)?|(potassium )?glucosamine (potassium )?sulfate( complex)?,Las formas estabilizadas 2KCl/2NaCl se consideran sulfato de glucosamina,A: misma molécula (sal estabilizada)
+reishi (ganoderma lucidum),reishi( mushroom)?|ganoderma( lucidum)?,,B: nombre común = nombre científico
+shiitake (lentinula edodes),shiitake( mushroom)?|lentinul?a edodes|lentinus edodes,,B: nombre común = nombre científico
+maitake (grifola frondosa),maitake( mushroom)?|grifola frondosa,,B: nombre común = nombre científico
+lion's mane (hericium erinaceus),lion'?s mane( mushroom)?|hericium erinaceus,,B: nombre común = nombre científico
+ginkgo (ginkgo biloba),ginkgo( biloba)?,,B: nombre común = nombre científico
+panax ginseng (asian / korean ginseng),panax ginseng|asian ginseng|korean ginseng|chinese ginseng|ginseng panax,El ginseng americano y el siberiano son otras plantas y quedan aparte,B: nombre común = nombre científico
+ginger (zingiber officinale),ginger|zingiber officinale,,B: nombre común = nombre científico
+turmeric (curcuma longa),turmeric|curcuma longa|curcuma,La curcumina (compuesto aislado) queda aparte,B: nombre común = nombre científico
+green tea (camellia sinensis),green tea|camellia sinensis,,B: nombre común = nombre científico
+milk thistle (silybum marianum),milk thistle|silybum marianum,La silimarina (compuesto) queda aparte,B: nombre común = nombre científico
+saw palmetto (serenoa repens),saw palmetto|serenoa repens,,B: nombre común = nombre científico
+nettle (urtica dioica),(stinging )?nettle|urtica dioica,,B: nombre común = nombre científico
+holy basil (ocimum sanctum / tulsi),holy basil|sacred basil|tulsi|ocimum (sanctum|tenuiflorum),,B: nombre común = nombre científico
+eleuthero (eleutherococcus senticosus),eleuthero|eleutherococcus senticosus|siberian ginseng,,B: nombre común = nombre científico
+st john's wort (hypericum perforatum),st johns? wort|st\.? john's wort|hypericum perforatum,,B: nombre común = nombre científico
+valerian (valeriana officinalis),valerian|valeriana officinalis,,B: nombre común = nombre científico
+passionflower (passiflora incarnata),passionflower|passion flower|passiflora incarnata,«passion» a secas es ambiguo (flor o fruta) y no se agrupa,B: nombre común = nombre científico
+rhodiola (rhodiola rosea),rhodiola( rosea)?,,B: nombre común = nombre científico
+tribulus (tribulus terrestris),tribulus( terrestris)?,,B: nombre común = nombre científico
+boswellia (boswellia serrata),boswellia( serrata)?|indian frankincense,,B: nombre común = nombre científico
+bacopa (bacopa monnieri),bacopa( monnier[ai])?,,B: nombre común = nombre científico
+gymnema (gymnema sylvestre),gymnema( sylvestre)?,,B: nombre común = nombre científico
+coleus (coleus forskohlii),coleus( forskohlii)?,La forskolina (compuesto) queda aparte,B: nombre común = nombre científico
+mucuna (mucuna pruriens),mucuna( pruriens)?|velvet bean,,B: nombre común = nombre científico
+tongkat ali (eurycoma longifolia),tongkat ali|eurycoma longifolia|longjack,,B: nombre común = nombre científico
+black cohosh (actaea racemosa),black cohosh|(cimicifuga|actaea) racemosa,,B: nombre común = nombre científico
+maca (lepidium meyenii),maca|lepidium meyenii,,B: nombre común = nombre científico
+moringa (moringa oleifera),moringa( oleifera)?,,B: nombre común = nombre científico
+elderberry (sambucus nigra),(black )?elderberry|sambucus nigra,,B: nombre común = nombre científico
+hawthorn (crataegus),hawthorn|crataegus( oxyacantha| oxycantha| pinnatifida)?,,B: nombre común = nombre científico
+dandelion (taraxacum officinale),dandelion|taraxacum officinale,,B: nombre común = nombre científico
+fenugreek (trigonella foenum-graecum),fenugreek|trigonella foenum-graecum,,B: nombre común = nombre científico
+garlic (allium sativum),garlic|allium sativum,,B: nombre común = nombre científico
+astragalus (astragalus membranaceus),astragalus( membranaceus)?,,B: nombre común = nombre científico
+schisandra (schisandra chinensis),schi[sz]andra( chinensis)?,,B: nombre común = nombre científico
+aloe vera (aloe barbadensis),aloe( vera| barbadensis)?,Aloe ferox («cape aloe») queda aparte,B: nombre común = nombre científico
+goji (lycium barbarum),goji|wolfberry|lycium( barbarum)?,,B: nombre común = nombre científico
+garcinia cambogia,garcinia( cambogia)?,Garcinia mangostana (mangostán) queda aparte,B: nombre común = nombre científico
+licorice (glycyrrhiza),(chinese )?licorice|glycyrrhiza( uralensis| glabra)?,Agrupa G. glabra y G. uralensis bajo el nombre común,B: nombre común = nombre científico
+dong quai (angelica sinensis),dong quai|angelica sinensis,,B: nombre común = nombre científico
+cat's claw (uncaria tomentosa),cat'?s claw|uncaria tomentosa,,B: nombre común = nombre científico
+gotu kola (centella asiatica),gotu kola|centella asiatica,,B: nombre común = nombre científico
+yohimbe (pausinystalia yohimbe),yohimbe|pausinystalia yohimbe,La yohimbina (compuesto) queda aparte,B: nombre común = nombre científico
+chamomile (matricaria chamomilla),(german )?chamomile|matricaria (chamomilla|recutita),,B: nombre común = nombre científico
+burdock (arctium lappa),burdock|arctium lappa,,B: nombre común = nombre científico
+horny goat weed (epimedium),horny goat weed|epimedium( sagi?ttatum| brevicornum| grandiflorum)?,,B: nombre común = nombre científico
+peppermint (mentha piperita),peppermint|mentha piperita,,B: nombre común = nombre científico
+rosemary (rosmarinus officinalis),rosemary|rosmarinus officinalis,,B: nombre común = nombre científico
+lactobacillus acidophilus,acidophilus,Nombre sin género,E: abreviatura de la especie

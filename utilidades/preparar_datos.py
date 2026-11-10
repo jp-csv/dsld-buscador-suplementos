@@ -15,6 +15,12 @@ Genera:
     etiquetas.parquet     una fila por etiqueta (todos los tipos de producto)
     ingredientes.parquet  una fila por ingrediente declarado (sin las filas de información nutrimental)
     atributos.parquet     una fila por etiqueta y atributo (Vegan, Organic, Gluten Free...)
+    agrupaciones.csv      tabla de auditoría: cada nombre original, a qué ingrediente quedó y con qué regla
+
+El nombre de cada ingrediente se normaliza en tres capas (ver METODOLOGIA.md):
+    1. limpieza de ruido (minúsculas, sin paréntesis ni palabras como "organic" o "extract")
+    2. sinónimos curados a mano (utilidades/sinonimos.csv)
+    3. clave de comparación automática (ignora guiones, orden de palabras y el prefijo l-/dl-)
 """
 import glob
 import os
@@ -53,32 +59,50 @@ NUTRIMENTAL = {
     "total sugars", "added sugars", "includes added sugars",
 }
 
-# Ruido que se quita del nombre. En ingredientes botánicos se quita todo; en el resto se conservan
-# palabras que sí identifican al ingrediente (fish OIL, krill OIL, juice, extract...).
-RUIDO_BASE = (r"organic|organically grown|certified|wildcrafted|raw|dried|dry|fresh|powdered|powder|"
-              r"standardized|concentrate|and|from")
-RUIDO_BOTANICO = (RUIDO_BASE + r"|extract|extracts|whole|herb|herbs|root|roots|leaf|leaves|flower|flowers|"
-                  r"seed|seeds|bark|fruit|berry|aerial parts?|rhizome|bulb|stem|juice|oil|tincture")
-RE_BASE = re.compile(r"\b(" + RUIDO_BASE + r")\b")
-RE_BOT = re.compile(r"\b(" + RUIDO_BOTANICO + r")\b")
+# Capa 1: palabras que se quitan del nombre. Ya no están escritas aquí: viven en utilidades/calificadores.csv, que sale
+# de una revisión de los datos (ver candidatos_calificadores.py). Cada palabra tiene un ámbito:
+#   general    -> todas las categorías      botanico   -> solo ingredientes botánicos
+#   bacteria   -> solo bacterias            aminoacido -> solo aminoácidos
+# Las filas "no_fusionar" documentan palabras que se revisaron y se decidió NO quitar (y por qué).
+RUTA_CALIFICADORES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "calificadores.csv")
+CATEGORIA_DE_AMBITO = {"botanico": "botanical", "bacteria": "bacteria", "aminoacido": "amino acid"}
 
-# Vitaminas y nutrientes con varios nombres: se agrupan bajo un solo nombre (se aplica al nombre ya limpio).
-SINONIMOS = [
-    (r"vitamin a|retinol|retinyl.*|vitamin a palmitate", "vitamin a (retinol)"),
-    (r"vitamin c|ascorb.*|calcium ascorbate|sodium ascorbate", "vitamin c (ascorbic acid)"),
-    (r"vitamin d\d?|vitamin d-\d|cholecalciferol|ergocalciferol", "vitamin d (cholecalciferol)"),
-    (r"vitamin e|(d|dl|d-alpha|dl-alpha|alpha)?[- ]?tocopher.*|mixed tocopherols", "vitamin e (tocopherol)"),
-    (r"vitamin k\d?|vitamin k-\d|menaquinone.*|phylloquinone", "vitamin k"),
-    (r"vitamin b-?1|thiamin|thiamine.*", "thiamin (vitamin b1)"),
-    (r"vitamin b-?2|riboflavin.*", "riboflavin (vitamin b2)"),
-    (r"vitamin b-?3|niacin|niacinamide|nicotinamide|inositol hexanicotinate", "niacin (vitamin b3)"),
-    (r"vitamin b-?5|pantothenic acid|calcium pantothenate|d-calcium pantothenate", "pantothenic acid (vitamin b5)"),
-    (r"vitamin b-?6|pyridox.*", "vitamin b6 (pyridoxine)"),
-    (r"vitamin b-?7|biotin", "biotin (vitamin b7)"),
-    (r"vitamin b-?9|folate|folic acid|l-?methylfolate|methylfolate|5-mthf|quatrefolic", "folate (vitamin b9)"),
-    (r"vitamin b-?12|cobalamin|cyanocobalamin|methylcobalamin|hydroxocobalamin", "vitamin b12 (cobalamin)"),
-]
-SINONIMOS = [(re.compile(r"^(" + p + r")$"), canon) for p, canon in SINONIMOS]
+
+def _regex(palabras):
+    return re.compile(r"(?<![\w-])(?:" + "|".join(sorted(palabras, key=len, reverse=True)) + r")(?![\w-])")
+
+
+def cargar_calificadores(ruta=RUTA_CALIFICADORES):
+    t = pd.read_csv(ruta, dtype=str, keep_default_na=False)
+    quitar = t[t["decision"] == "quitar"]
+    por_categoria = {CATEGORIA_DE_AMBITO[a]: _regex(g["palabra"]) for a, g in quitar.groupby("ambito")
+                     if a in CATEGORIA_DE_AMBITO and a != "aminoacido"}
+    general = _regex(quitar.loc[quitar["ambito"] == "general", "palabra"])
+    normalizar = [(re.compile(r"(?<![\w-])(?:" + p + r")(?![\w-])"), r) for p, r in
+                  zip(t.loc[t["decision"] == "normalizar", "palabra"], t.loc[t["decision"] == "normalizar", "reemplazo"])]
+    amino = quitar[quitar["ambito"] == "aminoacido"]
+    amino = [(re.compile(r"(.+?)[ -](?:" + p + ")"), re.compile(e) if e else None)
+             for p, e in zip(amino["palabra"], amino["excepto"])]
+    return general, por_categoria, normalizar, amino
+
+
+# Abreviaturas de género bacteriano: "l acidophilus" = "lactobacillus acidophilus".
+ABREV_GENERO = {"l": ("lactobacillus", r"acidophilus|rhamnosus|plantarum|casei|paracasei|bulgaricus|salivarius|reuteri|"
+                                       r"gasseri|brevis|fermentum|helveticus|johnsonii|crispatus|delbrueckii"),
+                "b": ("bifidobacterium", r"bifidum|longum|lactis|breve|infantis|animalis|adolescentis|bifidus"),
+                "s": ("streptococcus", r"thermophilus")}
+RE_ABREV = re.compile(r"^([lbs])\.? (" + "|".join(v[1] for v in ABREV_GENERO.values()) + r")\b")
+
+
+# Capa 2: sinónimos curados a mano. Cada regla es (grupo, patrón); el patrón debe coincidir con TODO el nombre ya
+# limpio (re.fullmatch) y gana la primera regla que coincida. Se editan en utilidades/sinonimos.csv.
+RUTA_SINONIMOS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sinonimos.csv")
+
+
+def cargar_sinonimos(ruta=RUTA_SINONIMOS):
+    tabla = pd.read_csv(ruta, dtype=str, keep_default_na=False)
+    return [(g, re.compile(p)) for g, p in zip(tabla["grupo"], tabla["patron"])]
+
 
 MASA_A_MCG = {"mg": 1000.0, "Gram(s)": 1e6, "g": 1e6, "grams": 1e6, "mcg": 1.0, "ug": 1.0, "ng": 0.001}
 UNIDAD_ALIAS = {
@@ -89,18 +113,57 @@ UNIDAD_ALIAS = {
 }
 
 
+CAL_GENERAL, CAL_POR_CATEGORIA, CAL_NORMALIZAR, CAL_AMINO = cargar_calificadores()
+
+
 def limpiar(nombre, categoria=""):
     s = nombre.lower()
     s = re.sub(r"\(.*?\)", " ", s)
     s = re.sub(r"[^a-z0-9\s'-]", " ", s)
-    s = (RE_BOT if categoria == "botanical" else RE_BASE).sub(" ", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    for patron, reemplazo in CAL_NORMALIZAR:
+        s = patron.sub(reemplazo, s)
+    s = RE_ABREV.sub(lambda m: ABREV_GENERO[m.group(1)][0] + " " + m.group(2), s)
+    s = CAL_GENERAL.sub(" ", s)
+    if categoria in CAL_POR_CATEGORIA:
+        s = CAL_POR_CATEGORIA[categoria].sub(" ", s)
+    s = re.sub(r"\s*-\s*", "-", s)  # "alpha -lipoic" y "l- citrulline" -> "alpha-lipoic", "l-citrulline"
     s = re.sub(r"\s+", " ", s).strip(" -")
-    if not s:
-        return None
-    for patron, canon in SINONIMOS:
-        if patron.match(s):
-            return canon
-    return s
+    if categoria == "amino acid":
+        for patron, excepto in CAL_AMINO:
+            m = patron.fullmatch(s)
+            if m and not (excepto and excepto.fullmatch(m.group(1))):
+                s = m.group(1)
+    return s or None
+
+
+def sinonimo(nombre, reglas):
+    """Capa 2: grupo curado al que pertenece el nombre limpio, o None."""
+    for grupo, patron in reglas:
+        if patron.fullmatch(nombre):
+            return grupo
+    return None
+
+
+def clave(nombre):
+    """Capa 3: clave de comparación. Dos nombres con la misma clave son el mismo ingrediente.
+
+    Cambia guiones, + y / por espacios, pega la letra suelta con su número ("q 10" -> "q10"), quita los prefijos
+    l- (L-glutamine = glutamine; dl- y d- NO se quitan: son mezclas racémicas o formas distintas) y ordena las palabras (lactobacillus acidophilus = acidophilus lactobacillus).
+    Solo sirve para comparar: el nombre que se muestra es otro (ver elegir_nombres)."""
+    t = re.sub(r"[-+/]", " ", nombre)
+    t = re.sub(r"\b([a-z])\s+(\d+)\b", r"\1\2", t)
+    return " ".join(sorted(w for w in t.split() if w != "l"))
+
+
+def elegir_nombres(nombres, etiquetas_por_nombre, canonicos):
+    """Para cada clave elige el nombre que se muestra: el grupo curado si lo hay; si no, el más frecuente."""
+    df = pd.DataFrame({"nombre": nombres})
+    df["clave"] = df["nombre"].map(clave)
+    df["n"] = df["nombre"].map(etiquetas_por_nombre).fillna(0)
+    df["canonico"] = df["nombre"].isin(canonicos)
+    df = df.sort_values(["clave", "canonico", "n"], ascending=[True, False, False])
+    return df.groupby("clave")["nombre"].first(), df.set_index("nombre")["clave"]
 
 
 def cargar(carpeta, prefijo, columnas=None):
@@ -143,9 +206,33 @@ def main():
     i["original"] = i["Ingredient"].str.strip()
     i = i[~i["original"].str.lower().isin(NUTRIMENTAL)]
     # Se limpia una sola vez cada par (nombre, categoría) distinto: mucho más rápido que fila por fila.
-    pares = i[["original", "DSLD Ingredient Categories"]].drop_duplicates()
-    pares["ingrediente"] = [limpiar(n, c) for n, c in zip(pares["original"], pares["DSLD Ingredient Categories"])]
-    i = i.merge(pares, on=["original", "DSLD Ingredient Categories"], how="left").dropna(subset=["ingrediente"])
+    reglas = cargar_sinonimos()
+    canonicos = {g for g, _ in reglas}
+    pares = i[["original", "DSLD Ingredient Categories"]].drop_duplicates().reset_index(drop=True)
+    pares["limpio"] = [limpiar(n, c) for n, c in zip(pares["original"], pares["DSLD Ingredient Categories"])]
+    pares = pares.dropna(subset=["limpio"])
+    # Capa 2: sinónimos curados (se resuelven una vez por cada nombre limpio distinto).
+    grupo_de = {n: sinonimo(n, reglas) for n in pares["limpio"].unique()}
+    pares["paso2"] = pares["limpio"].map(grupo_de).fillna(pares["limpio"])
+    i = i.merge(pares[["original", "DSLD Ingredient Categories", "limpio", "paso2"]],
+                on=["original", "DSLD Ingredient Categories"], how="inner")
+    # Capa 3: clave de comparación; se muestra el grupo curado si lo hay y si no el nombre más frecuente.
+    por_nombre = i.groupby("paso2")["DSLD ID"].nunique()
+    nombre_de_clave, clave_de = elegir_nombres(pares["paso2"].unique(), por_nombre, canonicos)
+    final_de = {n: nombre_de_clave[k] for n, k in clave_de.items()}
+    pares["ingrediente"] = pares["paso2"].map(final_de)
+    pares["regla"] = np.where(pares["limpio"].map(grupo_de).notna(), "sinónimo curado",
+                              np.where(pares["ingrediente"] != pares["limpio"], "clave de comparación", "solo limpieza"))
+    i["ingrediente"] = i["paso2"].map(final_de)
+    # Tabla de auditoría: qué se hizo con cada nombre original.
+    audit = (i.groupby(["original", "DSLD Ingredient Categories"])["DSLD ID"].nunique().rename("etiquetas").reset_index()
+               .merge(pares[["original", "DSLD Ingredient Categories", "limpio", "ingrediente", "regla"]],
+                      on=["original", "DSLD Ingredient Categories"])
+               .rename(columns={"DSLD Ingredient Categories": "categoria", "limpio": "nombre_limpio",
+                                "ingrediente": "ingrediente_final"})
+               .sort_values("etiquetas", ascending=False))
+    audit[["original", "categoria", "nombre_limpio", "ingrediente_final", "regla", "etiquetas"]].to_csv(
+        os.path.join(salida, "agrupaciones.csv"), index=False)
 
     unidad = i["Amount Per Serving Unit"].str.strip().replace(UNIDAD_ALIAS)
     cantidad = pd.to_numeric(i["Amount Per Serving"], errors="coerce")
@@ -196,6 +283,8 @@ def main():
     ingredientes.to_parquet(os.path.join(salida, "ingredientes.parquet"), index=False, compression="zstd")
     atributos.to_parquet(os.path.join(salida, "atributos.parquet"), index=False)
     print(f"Etiquetas: {len(etiquetas):,} | ingredientes: {len(ingredientes):,} | atributos: {len(atributos):,}")
+    print(f"Nombres originales: {audit['original'].nunique():,} | tras la limpieza: {audit['nombre_limpio'].nunique():,} "
+          f"| ingredientes finales: {audit['ingrediente_final'].nunique():,}")
     print("Guardado en", salida)
 
 

@@ -12,7 +12,7 @@ Columnas: `dsld_id`, `off_market`, `entry_date`, `off_market_date`, `other_event
 
 ## `preparar_datos.py`
 
-Genera los tres Parquet que usa la app (`app/datos/`) a partir de los CSV de la descarga completa y de `dsld_json_extra.csv`. Tarda menos de un minuto. Limpia los nombres de ingredientes, agrupa las vitaminas con varios nombres, quita las filas de información nutrimental y normaliza las unidades.
+Genera los tres Parquet que usa la app (`app/datos/`) a partir de los CSV de la descarga completa y de `dsld_json_extra.csv`. Tarda menos de un minuto. Agrupa los nombres de ingredientes en tres capas (limpieza con las palabras de `calificadores.csv`, `sinonimos.csv` y comparación automática de escritura; ver `METODOLOGIA.md`), quita las filas de información nutrimental, normaliza las unidades y escribe `agrupaciones.csv` para auditar. Para corregir o agregar un sinónimo, edita `sinonimos.csv`; para una palabra que sobra, `calificadores.csv`; y vuelve a correrlo. `candidatos_calificadores.py` lista las palabras que más sobran en los ingredientes más comunes, para revisarlas.
 
 ```bash
 python utilidades/preparar_datos.py DSLD-full-database-CSV/ dsld_json_extra.csv

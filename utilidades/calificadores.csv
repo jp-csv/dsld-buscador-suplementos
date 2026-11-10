@@ -1,0 +1,258 @@
+ambito,decision,palabra,reemplazo,excepto,ingredientes_base_con_la_palabra,etiquetas_afectadas,criterio
+general,quitar,organic,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,organically grown,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,certified,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,wildcrafted,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,raw,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,dried,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,dry,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,fresh,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,powdered,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,powder,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,standardized,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,concentrate,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,and,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,from,,,,,Origen o presentación sin identidad (ya estaba en la versión inicial)
+general,quitar,anhydrous,,,18,5113,Grado de hidratación: misma molécula
+general,quitar,monohydrate,,,21,2361,Grado de hidratación: misma molécula
+general,quitar,dihydrate,,,12,774,Grado de hidratación: misma molécula
+general,quitar,micronized,,,43,2564,Tratamiento físico: misma molécula
+general,quitar,instantized,,,19,511,Tratamiento físico: misma molécula
+general,quitar,crystalline,,,7,39,Tratamiento físico: misma molécula
+general,quitar,natural,,,168,2075,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,naturally,,,6,154,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,occurring,,,5,149,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,pure,,,140,685,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,purified,,,30,313,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,total,,,60,4787,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,usp,,,16,42,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,fcc,,,8,10,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,of,,,84,842,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,quitar,the,,,4,9,"Calificador genérico (origen, pureza, grado o artículo) sin cambiar la sustancia"
+general,normalizar,hydrochloride|monohydrochloride|hydrochlorid,hcl,,27,5301,Ortografía: «hydrochloride» = «HCl» (no fusiona la sal con la base)
+botanico,quitar,extract,,,188,11460,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,extracts,,,15,434,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,whole,,,38,1356,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,herb,,,20,393,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,herbs,,,4,194,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,root,,,15,314,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,roots,,,,,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,leaf,,,11,46,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,leaves,,,,,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,flower,,,2,4,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,flowers,,,,,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,seed,,,49,2448,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,seeds,,,2,6,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,bark,,,4,6,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,fruit,,,53,2831,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,berry,,,13,345,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,aerial parts?,,,,,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,rhizome,,,,,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,bulb,,,,,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,stem,,,1,3,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,juice,,,11,110,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,oil,,,53,4058,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,tincture,,,1,1,Parte de la planta o forma de preparación (versión inicial); extracto ≠ polvo se documenta como limitación
+botanico,quitar,liquid,,,287,4078,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,glycerite,,,181,2939,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,ext,,,152,1055,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,extr,,,7,17,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,extact,,,7,15,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,freeze,,,148,1106,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,spray,,,1,2,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,fluid,,,71,112,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,aqueous,,,68,554,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,hydroethanolic,,,45,518,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,supercritical,,,48,1326,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,co2,,,34,468,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,std,,,57,403,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,standardised,,,10,114,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,concentrated,,,63,353,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,concentrates,,,11,35,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,conc,,,21,71,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,pdr,,,55,1041,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,pwd,,,24,64,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,powders,,,9,25,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,org,,,34,205,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,undried,,,21,122,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,dehydrate,,,10,51,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,dehydrated,,,16,55,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,harvested,,,30,57,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,sd,,,35,261,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,pe,,,31,62,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,tops,,,24,172,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,aerial,,,51,320,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,mushroom,,,34,4253,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,mushrooms,,,6,35,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,plant,,,130,2520,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,fruiting bod(?:y|ies),,,,,Revisión top-1000: aparece como sobrante en muchos botánicos distintos (forma de extracción/presentación)
+botanico,quitar,\d+,,,,,"Razón de extracto o % de estandarización (10:1, 95%): sigue buscable en el nombre original"
+bacteria,quitar,subsp,,,13,594,Nomenclatura de subespecie (Bifidobacterium animalis subsp. lactis = B. lactis)
+bacteria,quitar,ssp,,,10,82,Nomenclatura de subespecie (Bifidobacterium animalis subsp. lactis = B. lactis)
+bacteria,quitar,animalis,,,3,1772,Nomenclatura de subespecie (Bifidobacterium animalis subsp. lactis = B. lactis)
+aminoacido,quitar,hcl,,glutamic acid|l-glutamic acid,30,4725,Sal clorhidrato de un aminoácido: se agrupa con el aminoácido
+-,no_fusionar,citrate,,,21,1773,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,malate,,,15,785,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,gluconate,,,11,449,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,glycinate,,,14,779,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,carbonate,,,9,404,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,oxide,,,14,458,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,phosphate,,,10,850,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,chloride,,,10,735,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,orotate,,,9,83,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,nitrate,,,14,400,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,ketoglutarate,,,13,262,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,akg,,,13,181,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,bitartrate,,,3,2796,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,sulfate,,,17,2778,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,sodium,,,20,1563,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,potassium,,,10,709,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,calcium,,,15,154,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,magnesium,,,14,316,"La sal/forma es parte de lo que se compra y la dosis es de la sal, no del elemento"
+-,no_fusionar,hcl,,,30,4725,En no aminoácidos el HCl cambia el producto (betaína HCl = ácido digestivo; betaína anhidra = TMG)
+-,no_fusionar,complex,,,228,11423,"Indica mezcla/compuesto: es otro ingrediente, no el mismo"
+-,no_fusionar,blend,,,226,4069,"Indica mezcla/compuesto: es otro ingrediente, no el mismo"
+-,no_fusionar,proprietary,,,101,30345,"Indica mezcla/compuesto: es otro ingrediente, no el mismo"
+-,no_fusionar,combination,,,10,159,"Indica mezcla/compuesto: es otro ingrediente, no el mismo"
+-,no_fusionar,formula,,,12,68,"Indica mezcla/compuesto: es otro ingrediente, no el mismo"
+-,no_fusionar,matrix,,,25,429,"Indica mezcla/compuesto: es otro ingrediente, no el mismo"
+-,no_fusionar,system,,,7,47,"Indica mezcla/compuesto: es otro ingrediente, no el mismo"
+-,no_fusionar,synergistic,,,8,355,"Indica mezcla/compuesto: es otro ingrediente, no el mismo"
+-,no_fusionar,fiber,,,60,2943,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,protein,,,36,2593,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,enzyme,,,36,4485,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,enzymes,,,19,234,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,probiotic,,,25,4473,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,prebiotic,,,24,1029,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,digestive,,,26,2613,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,amino,,,11,663,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,acid,,,32,1115,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,acids,,,8,2552,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,fatty,,,8,2573,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,peptides,,,11,873,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,peptide,,,9,72,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,hydrolyzed,,,9,1457,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,hydrolysate,,,8,353,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,isolate,,,15,2840,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,lysate,,,11,67,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,mycelium,,,22,595,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,mycelial,,,9,30,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,fermented,,,189,2010,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,sprouted,,,34,659,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,sprout,,,27,971,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,sprouts,,,14,265,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,liposomal,,,13,84,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,phytosome,,,20,1041,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,phospholipid,,,13,152,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,nano,,,11,28,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,ester,,,21,296,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,esters,,,8,302,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,ethyl,,,18,429,"Cambia la identidad o el proceso (otra fracción, forma o fuente); se busca por término"
+-,no_fusionar,red,,,54,3014,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,green,,,50,3092,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,black,,,43,2634,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,white,,,37,495,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,yellow,,,14,201,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,purple,,,17,157,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,blue,,,11,118,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,brown,,,11,648,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,golden,,,12,112,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,sweet,,,12,701,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,bitter,,,8,418,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,wild,,,116,2102,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,chinese,,,44,1564,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,european,,,15,548,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,asian,,,10,1269,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,indian,,,19,292,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,korean,,,9,747,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,siberian,,,9,567,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,brazilian,,,12,49,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,japanese,,,8,37,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,american,,,6,1094,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,mountain,,,10,65,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,sea,,,20,748,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,tree,,,21,126,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,young,,,18,192,"Suele indicar otra especie o variedad (wild yam ≠ yam, red clover ≠ clover)"
+-,no_fusionar,lutemax,,,3,402,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,floraglo,,,3,173,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,resvida,,,2,237,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,capsimax,,,6,246,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,svetol,,,3,118,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,meriva,,,4,181,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,bioperine,,,3,708,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,howaru,,,14,185,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,albion,,,9,34,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,foodstate,,,12,133,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,hiactives,,,12,30,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,kirkman,,,10,109,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,arbonne,,,7,49,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,oxyphyte,,,9,77,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,pxn,,,13,47,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,jce,,,12,26,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,orac,,,13,95,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,dsm,,,13,99,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,rosell,,,12,65,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,bl,,,8,745,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,ha,,,32,1137,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,hn,,,3,19,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,gps,,,9,11,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,ojc,,,8,22,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,vp,,,17,437,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,hds,,,21,270,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,cul,,,15,176,"Marca, cepa o ingrediente patentado: identifica un producto concreto (sigue buscable)"
+-,no_fusionar,super,,,43,916,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,superpure,,,43,59,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,ultra,,,30,243,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,plus,,,28,179,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,premium,,,18,109,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,advanced,,,19,122,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,max,,,12,138,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,perfect,,,10,68,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,ultimate,,,8,53,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,genesis,,,7,16,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,gold,,,10,74,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,active,,,24,189,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,strength,,,13,160,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,high,,,29,164,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,top,,,28,120,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,new,,,11,19,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,brand,,,10,41,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,activated,,,9,19,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,extra,,,9,63,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,triple,,,11,80,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,tri,,,11,188,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,hi,,,11,35,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,bio,,,13,121,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,vegan,,,11,133,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,vegetarian,,,15,335,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,gmo,,,14,52,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,non,,,23,115,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,free,,,30,169,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,with,,,23,108,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,as,,,9,40,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,all,,,9,53,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,to,,,18,39,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,a,,,33,586,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,e,,,26,83,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,i,,,13,331,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,k,,,12,92,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,l,,,26,837,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,d,,,25,1536,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,n,,,17,2565,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,p,,,27,79,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,r,,,11,390,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,v,,,7,18,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,w,,,13,53,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,x,,,8,38,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,c,,,9,90,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,g,,,7,23,"Mercadotecnia, letra suelta o palabra vacía: no aporta identidad o es demasiado ambigua para quitarla"
+-,no_fusionar,liver,,,13,110,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,bovine,,,15,1255,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,porcine,,,7,23,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,beef,,,7,109,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,marine,,,13,292,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,dairy,,,11,81,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,soy,,,13,1445,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,milk,,,9,195,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,honey,,,10,60,Fuente animal/alimento: cambia el origen del ingrediente
+-,no_fusionar,yeast,,,13,617,Fuente animal/alimento: cambia el origen del ingrediente

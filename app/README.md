@@ -17,10 +17,9 @@ Los filtros de la barra lateral se aplican a todas las secciones (en *Comparar m
 ## Detalles
 
 - **Tipo de producto:** es una lista de casillas; *Todos* marca o desmarca todas de golpe, «Mostrar más» despliega los tipos restantes, y sin ninguna marcada se ven todos los tipos. Por defecto están todos marcados, y la exclusión de marcas de carga masiva está desactivada. Con tipos distintos de botánico, «Con qué se combina» y los mapas pasan solos a incluir vitaminas y minerales.
-- **Término en el nombre original del ingrediente:** busca palabras (*extract*, *powder*, *co2*, *95 %*) dentro de cómo escribió el ingrediente cada etiqueta, antes de agrupar. Sirve para separar lo que el agrupado junta (en botánicos, extracto y polvo cuentan como el mismo ingrediente). Se combina con el ingrediente elegido y también afecta la dosis.
-- **Variantes del nombre:** con la casilla activada, «turmeric» también incluye «turmeric co2», «turmeric 95»… (nombres que contienen esa palabra completa).
+- **Ingrediente:** un solo campo con dos tipos de opción. 🧬 **(agrupado):** el ingrediente con todas sus escrituras juntas (en botánicos, extracto, polvo y nombre científico cuentan como uno). 🔍 **(término):** un nombre tal como lo escribió la etiqueta, sin agrupar (p. ej. *turmeric powder*, *turmeric co2 extract*), con al menos 5 etiquetas. Sirve para separar lo que el agrupado junta. Pueden elegirse varios de cualquier tipo; la etiqueta debe tener todos o al menos uno, según la opción que aparece abajo.
 - **Dosis:** una por etiqueta (si se repite, la mediana), en la unidad más usada del ingrediente; la masa se muestra en mg o mcg según el tamaño típico. Vitamina D: IU convertidas a mcg. IU de A y E, mL y CFU no se mezclan con masas. Arriba de la gráfica se indica cuántas etiquetas entran, cuántas usan otra unidad y cuántas no declaran cantidad; el detalle del método está en la sección *Dosis de referencia*.
-- **Lista de ingredientes:** solo aparecen los que tienen al menos 5 etiquetas.
+- **Lista de ingredientes:** los agrupados aparecen si tienen al menos 50 etiquetas y los términos si tienen al menos 5. Dentro de lo que escribes, salen primero los agrupados y, entre ellos, los que tienen más etiquetas.
 - **Cargas masivas:** hay una casilla (desactivada por defecto) para excluir TerraVita Premium Collection, TerraVita, Herbal Terra y Hawaii Pharm.
 - En listas muy grandes, las palabras de los títulos se calculan con una muestra de 30,000 etiquetas. La tabla muestra hasta 1,000 productos; la descarga trae todos.
 

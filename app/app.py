@@ -167,16 +167,51 @@ if _ocultos:
 sel_tipo = [] if (not _m or len(_m) == len(TIPOS)) else list(st.session_state["tipos_marcados"])
 if not _m:
     st.sidebar.caption("Sin ningún tipo marcado se ven todos.")
+ES_ING = set(ING_N.index)
+
+
+@st.cache_resource
+def datos_terminos():
+    """Nombres tal como los escribió cada etiqueta (sin agrupar, en minúsculas): etiquetas por nombre y originales de cada uno."""
+    cat = pd.Series(ingredientes["original"].cat.categories.astype(str))
+    bajo = cat.str.lower().str.strip()
+    codigos = ingredientes["original"].cat.codes.to_numpy()
+    ok = codigos >= 0
+    t = pd.DataFrame({"dsld_id": ingredientes["dsld_id"].to_numpy()[ok], "b": bajo.to_numpy()[codigos[ok]]})
+    n = t.groupby("b")["dsld_id"].nunique()
+    n = n[n >= MIN_ETIQUETAS_OPCION].sort_values(ascending=False)
+    originales = cat.groupby(bajo.to_numpy()).apply(list)
+    return n, {b: originales[b] for b in n.index}
+
+
+TERM_N, TERM_ORIG = datos_terminos()
+# Opciones: cada ingrediente agrupado (con al menos MIN_AGRUPADO etiquetas) y cada nombre sin agrupar (con al menos
+# MIN_ETIQUETAS_OPCION), aunque coincidan en texto. Los términos llevan «».
+MIN_AGRUPADO = 50
+OPCIONES = ING_N[ING_N >= MIN_AGRUPADO].index.tolist() + [f"«{t}»" for t in TERM_N.index]
+
+
+def _relleno(n_etiquetas, extra=0):
+    """Streamlit ordena las sugerencias por la longitud del texto de la opción (las más cortas primero). Un relleno
+    invisible al final hace que, a igualdad de lo escrito, salgan antes los ingredientes con más etiquetas y los
+    agrupados antes que los términos."""
+    nivel = 0 if n_etiquetas >= 1000 else 15 if n_etiquetas >= 300 else 30 if n_etiquetas >= 100 else 45
+    return "\u00a0" * (nivel + extra)
+
+
+def _formato_item(x):
+    if x in ES_ING:
+        return f"🧬 {x} (agrupado) · {ING_N[x]:,}" + _relleno(ING_N[x])
+    n_t = TERM_N[x[1:-1]]
+    return f"🔍 {x[1:-1]} (término) · {n_t:,}" + _relleno(n_t, 140)
+
+
 sel_ing = st.sidebar.multiselect(
-    "Ingrediente", ING_N.index.tolist(), format_func=lambda n: f"{n} ({ING_N[n]:,})",
-    placeholder="Escribe para buscar, p. ej. turmeric", select_all=False)
-variantes = st.sidebar.checkbox("Incluir variantes del nombre", value=True,
-                                help="Con «turmeric» también cuenta «turmeric co2», «turmeric 95 %», «organic turmeric root»…")
-termino_ing = st.sidebar.text_input(
-    "Término en el nombre original del ingrediente", placeholder="p. ej. co2, 95%, extract, powder",
-    help="Busca dentro de cómo escribió el ingrediente cada etiqueta (el nombre original, antes de agrupar). Así se "
-         "distingue lo que el agrupado junta: «turmeric extract» ≠ «turmeric powder». Con varias palabras deben estar "
-         "todas. Si elegiste un ingrediente, se aplica a ese ingrediente; si no, a cualquiera de la etiqueta.")
+    "Ingrediente", OPCIONES, format_func=_formato_item, placeholder="Escribe para buscar, p. ej. turmeric",
+    select_all=False,
+    help="Hay dos tipos de opción. 🧬 **(agrupado):** el ingrediente con todas sus escrituras juntas (extracto, polvo, "
+         "nombre científico…). 🔍 **(término):** un nombre tal como lo escribió la etiqueta, sin agrupar; sirve para "
+         "separar, p. ej., «turmeric extract» de «turmeric powder». Si eliges varios, aplica la opción de abajo.")
 modo_ing = "todos"
 if len(sel_ing) > 1:
     modo_ing = st.sidebar.radio("La etiqueta debe tener", ["todos", "al menos uno"], horizontal=True)
@@ -197,45 +232,12 @@ excluir_masiva = st.sidebar.checkbox(
     help="TerraVita Premium Collection, TerraVita, Herbal Terra y Hawaii Pharm subieron miles de etiquetas de golpe.")
 
 
-NOMBRES = st.cache_resource(lambda: pd.Series(sorted(map(str, ingredientes["ingrediente"].unique()))))()
-
-
-def nombres_de(nombre):
-    # El nombre exacto o, con «variantes», todos los que contienen esas palabras completas.
-    if not variantes:
-        return [nombre]
-    return NOMBRES[NOMBRES.str.contains(r"(?<!\w)" + re.escape(nombre) + r"(?!\w)", regex=True)].tolist()
-
-
-@st.cache_resource
-def originales_en_minusculas():
-    o = pd.Series(ingredientes["original"].cat.categories.astype(str))
-    return o, o.str.lower()
-
-
-def originales_con_termino():
-    """Nombres originales que contienen todas las palabras del término (None si no hay término)."""
-    palabras_t = termino_ing.lower().split()
-    if not palabras_t:
-        return None
-    o, bajo = originales_en_minusculas()
-    ok = pd.Series(True, index=o.index)
-    for w in palabras_t:
-        ok &= bajo.str.contains(w, regex=False)
-    return o[ok].tolist()
-
-
-COINCIDEN = originales_con_termino()
-
-
-def con_termino(filas):
-    """Deja solo las filas de ingrediente cuyo nombre original contiene el término (si hay término)."""
-    return filas if COINCIDEN is None else filas[filas["original"].isin(COINCIDEN)]
-
-
 def filas_de(nombre, filas=None):
+    """Filas de ingrediente de lo elegido: el ingrediente agrupado o, si es «término», ese nombre tal como lo escribió la etiqueta."""
     f = ingredientes if filas is None else filas
-    return con_termino(f[f["ingrediente"].isin(nombres_de(nombre))])
+    if nombre in ES_ING:
+        return f[f["ingrediente"] == nombre]
+    return f[f["original"].isin(TERM_ORIG[nombre[1:-1]])]
 
 
 def ids_de_ingrediente(nombre):
@@ -252,8 +254,6 @@ def filtrar(con_marca=True, con_anio=True):
         conjuntos = [ids_de_ingrediente(n_) for n_ in sel_ing]
         ids = set.intersection(*conjuntos) if modo_ing == "todos" else set.union(*conjuntos)
         e = e[e["dsld_id"].isin(ids)]
-    elif COINCIDEN is not None:
-        e = e[e["dsld_id"].isin(ingredientes.loc[ingredientes["original"].isin(COINCIDEN), "dsld_id"].unique())]
     if texto.strip():
         patron = r"\b" + re.escape(texto.strip().lower()) + r"\b"
         e = e[e["producto"].str.lower().str.contains(patron, regex=True)]
@@ -383,15 +383,13 @@ if seccion == SECCIONES[0]:
         c1.metric("Etiquetas", f"{n:,}", help="Etiquetas que cumplen los filtros")
         c1.caption(f"{pct(n / len(universo))} de las etiquetas " + ("de los tipos elegidos" if sel_tipo else "de toda la base")
                    + (" (sin cargas masivas)" if excluir_masiva else ""))
-        if COINCIDEN is not None:
-            c1.caption(f"Término «{termino_ing}»: {len(COINCIDEN):,} nombres originales coinciden.")
         c2.metric("Marcas distintas", f"{sub['marca'].nunique():,}")
         c3.metric("Siguen en el mercado", pct((sub["estatus"] == "En mercado").mean()))
         c4.metric("Tienen una mezcla", pct(sub["tiene_mezcla"].mean()),
                   help="Al menos un ingrediente de categoría *blend* (mezcla propietaria o complejo con nombre comercial)")
 
         if sel_ing:
-            with st.expander("¿Qué nombres de las etiquetas cuentan como este ingrediente?"):
+            with st.expander("¿Qué nombres de las etiquetas coinciden con lo que buscaste?"):
                 st.caption("Cada etiqueta escribe el ingrediente a su manera. Aquí están los nombres originales que se "
                            "agruparon bajo lo que buscaste (dentro de los filtros). Si falta uno que debería estar, o sobra "
                            "uno que no, es un error de agrupación: apúntalo. El método está en «Acerca de».")
@@ -400,7 +398,7 @@ if seccion == SECCIONES[0]:
                     filas_o = filas_o.astype({"original": str, "ingrediente": str}).drop_duplicates(["dsld_id", "original"])
                     tabla_o = (filas_o.groupby(["ingrediente", "original"]).size().rename("Etiquetas").reset_index()
                                .sort_values("Etiquetas", ascending=False))
-                    st.markdown(f"**{ing_o}**: {len(tabla_o):,} nombres originales distintos en "
+                    st.markdown(f"**{_formato_item(ing_o)}**: {len(tabla_o):,} nombres originales distintos en "
                                 f"{filas_o['dsld_id'].nunique():,} etiquetas" + (" (se muestran 50)" if len(tabla_o) > 50 else ""))
                     st.dataframe(tabla_o.head(50).rename(columns={"ingrediente": "Se cuenta como",
                                                                   "original": "Nombre en la etiqueta"}),
@@ -417,7 +415,7 @@ if seccion == SECCIONES[0]:
             solo_bot = st.toggle("Solo ingredientes botánicos", value=solo_botanicos,
                                  help="Desactívalo para incluir vitaminas, minerales y otros nutrientes.")
             categorias = {"botanical"} if solo_bot else COMBINABLES
-            elegidos = {x for n_ in sel_ing for x in nombres_de(n_)}
+            elegidos = {x for n_ in sel_ing for x in filas_de(n_, ing_sub)["ingrediente"].astype(str).unique()}
             otros = ing_sub[ing_sub["categoria"].isin(categorias) & ~ing_sub["ingrediente"].isin(elegidos)]
             acomp = otros.groupby("ingrediente")["dsld_id"].nunique().sort_values(ascending=False).head(10)
             if len(acomp):
@@ -743,7 +741,7 @@ if seccion == SECCIONES[4]:
 
 EXPLICACION_AGRUPACION = """
 Las etiquetas escriben el mismo ingrediente de muchas formas (en la base completa hay **76,390 nombres originales**).
-Para poder buscarlos y contarlos se agrupan en tres capas, en este orden. Quedan **39,755 ingredientes**.
+Para poder buscarlos y contarlos se agrupan en tres capas, en este orden. Quedan **39,753 ingredientes**.
 
 **1. Limpieza de ruido** (`utilidades/calificadores.csv`). Minúsculas; se quita lo que va entre paréntesis y los signos
 raros; se quitan palabras que no cambian el ingrediente (*organic*, *powder*, *anhydrous*, *micronized*, *total*…).
@@ -769,8 +767,8 @@ distintas).
 **Limitaciones.**
 - **Extracto ≠ polvo.** En botánicos, *turmeric extract*, *turmeric powder* y *turmeric root* se cuentan juntos como
   *turmeric*: son preparaciones distintas, pero agruparlas permite contar «cuántos productos llevan cúrcuma». Para
-  separarlas usa el filtro **«Término en el nombre original del ingrediente»** (p. ej. `extract`, `powder`, `co2`, `95%`),
-  que busca en lo que escribió la etiqueta, antes de agrupar.
+  separarlas, en el filtro **Ingrediente** elige las opciones marcadas **🔍 (término)** (p. ej. *turmeric powder*,
+  *turmeric co2 extract*): son los nombres tal como los escribió la etiqueta, antes de agrupar.
 - No se fusionan sales o ésteres distintos (citrato, óxido, bitartrato…) porque la dosis es de la sal y a veces cambia el
   producto (betaína HCl ≠ betaína anhidra); tampoco marcas, cepas ni especies distintas (ginseng americano ≠ asiático).
 - Lo que no está en las tablas no se agrupa: *curcumin* y *curcuminoids* quedan separados, igual que marcas como
@@ -796,10 +794,10 @@ filtros; el filtro **Tipo de producto** permite acotar (p. ej. solo botánicos: 
   de golpe; hay una casilla para excluirlas (por defecto no se excluyen).
 - Los nombres de ingredientes se **normalizan en tres capas** (detalle abajo): una limpieza de ruido, una tabla de
   sinónimos y una comparación automática de escritura. Es un método por reglas, no perfecto.
-- En botánicos el **extracto y el polvo de la planta se cuentan juntos**; para separarlos usa el filtro «Término en el
-  nombre original del ingrediente».
+- En botánicos el **extracto y el polvo de la planta se cuentan juntos**; para separarlos elige, en el filtro Ingrediente, las opciones marcadas
+  como **(término)**: son los nombres tal como los escribió la etiqueta.
 - De la lista de ingredientes se quitan las filas de información nutrimental (calorías, grasa total, carbohidratos,
-  azúcares…) y los ingredientes con menos de 5 etiquetas no aparecen en la lista desplegable.
+  azúcares…) y la lista de ingredientes muestra los agrupados con al menos 50 etiquetas y los términos con al menos 5.
 - Las **dosis** son las de la etiqueta por porción; se comparan solo en la unidad más usada del ingrediente
   (la sección *Dosis de referencia* explica cómo se estandarizan).
 - El **año de entrada** (sección *Altas por año*) es el de alta en el DSLD, no el de lanzamiento del producto.

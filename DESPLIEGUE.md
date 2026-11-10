@@ -28,7 +28,7 @@ Cuando termine, tendrás un link como `https://buscador-suplementos.streamlit.ap
 
 ## 3. Últimos ajustes en el README
 
-En `README.md`, reemplaza `https://TU-APP.streamlit.app` por el link real de tu app (puedes editarlo directo en GitHub con el ícono del lápiz).
+El `README.md` ya apunta a `https://supplement-label-search.streamlit.app/`. Si cambias el nombre de la app, actualiza ese link (puedes editarlo directo en GitHub con el ícono del lápiz).
 
 ## Notas
 

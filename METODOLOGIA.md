@@ -46,7 +46,7 @@ Hay nombres que la limpieza no puede unir porque son palabras distintas (*ascorb
 - `nota`: qué se dejó fuera.
 - `criterio`: por qué se agrupa. Son cinco criterios:
   - **A** misma molécula (ortografía, sal estabilizada o marca de la misma molécula: resveratrol/Resvida, luteína/Lutemax…).
-  - **B** nombre común = nombre científico en plantas y hongos (*turmeric* = *curcuma longa*, *reishi* = *ganoderma lucidum*).
+  - **B** nombre común = nombre científico en plantas y hongos (*turmeric* = *curcuma longa*, *reishi* = *ganoderma lucidum*). El grupo se muestra con el nombre común y el científico queda en la columna `nota`.
   - **C** familia NAD+ (el caso que originó la revisión, abajo).
   - **D** las 13 vitaminas con requerimiento nutricional (A, C, D, E, K, B1, B2, B3, B5, B6, B7, B9, B12).
   - **E** siglas y nombre químico del mismo compuesto (*GABA*, *MSM*, *PABA*, *DIM*, *alpha-GPC*).
@@ -71,10 +71,10 @@ Se decidió **no** quitar `dl-` ni `d-`: la DL-fenilalanina (mezcla racémica) e
 Se cuentan pares *(nombre original, categoría)*, que es lo que se agrupa:
 
 - 78,049 pares en total.
-- 69,522 quedan solo con la limpieza de la capa 1.
-- 2,326 se unen por la clave de la capa 3.
-- 6,201 se unen por una regla de la capa 2.
-- Los 76,390 nombres originales terminan en **39,755 ingredientes finales** (antes de la revisión sistemática eran 44,439). De ellos, 12,029 tienen al menos 5 etiquetas y son los que aparecen en la lista desplegable de la app.
+- 69,517 quedan solo con la limpieza de la capa 1.
+- 2,328 se unen por la clave de la capa 3.
+- 6,204 se unen por una regla de la capa 2.
+- Los 76,390 nombres originales terminan en **39,753 ingredientes finales** (antes de la revisión sistemática eran 44,439). De ellos, 1,977 tienen al menos 50 etiquetas y son los que aparecen como opción «agrupado» en la lista de la app; los nombres sin agrupar («término») aparecen si tienen al menos 5 etiquetas (19,445).
 - Los 100 ingredientes más comunes concentran 57 % de todas las filas de ingredientes; los 500, 79 %; los 1,000, 85 %.
 
 Las reglas de sinónimos tocan las filas más grandes: unos 530 mil de los 1.8 millones de ingredientes declarados pasan por la capa 2.
@@ -111,7 +111,7 @@ Fue el error que reveló que el método tenía huecos, así que sirve para expli
 
 ## 6. Límites (lo que el método no hace)
 
-- **Extracto ≠ polvo.** En botánicos, *turmeric extract*, *turmeric powder* y *turmeric root* se cuentan como un solo ingrediente. Son preparaciones distintas (un extracto concentra y el polvo es la planta molida), pero separarlas multiplicaría los ingredientes y haría imposible contar «cuántos productos llevan cúrcuma». Para distinguirlos, la app tiene el filtro **«Término en el nombre original del ingrediente»**: busca palabras (*extract*, *powder*, *co2*, *95 %*) dentro de lo que escribió la etiqueta, antes de agrupar, y se combina con el ingrediente elegido (cúrcuma: 7,255 etiquetas; con *co2*: 32; con *powder*: 831). La dosis y el desplegable de nombres originales también respetan ese filtro.
+- **Extracto ≠ polvo.** En botánicos, *turmeric extract*, *turmeric powder* y *turmeric root* se cuentan como un solo ingrediente. Son preparaciones distintas (un extracto concentra y el polvo es la planta molida), pero separarlas multiplicaría los ingredientes y haría imposible contar «cuántos productos llevan cúrcuma». Para distinguirlos, el filtro **Ingrediente** de la app ofrece dos tipos de opción: 🧬 **(agrupado)**, que junta todas las escrituras (*turmeric*: 7,255 etiquetas), y 🔍 **(término)**, que es un nombre tal como lo escribió la etiqueta, sin agrupar (por ejemplo *turmeric powder*: 151 etiquetas). Los términos son los nombres originales (en minúsculas) con al menos 5 etiquetas. El desplegable «¿Qué nombres de las etiquetas coinciden con lo que buscaste?» y la dosis funcionan con ambos tipos.
 - **No une palabras distintas que son lo mismo** si no hay una regla: *curcumin* y *curcuminoids* quedan separados.
 - **Las marcas comerciales** solo se agrupan si están en la tabla (Niagen, Suntheanine, KSM-66, Lutemax…). Muchas otras (*Kaneka ubiquinol*, *CoQsol*, *Longvida*) siguen apareciendo aparte.
 - **No une sales, ésteres ni formas** distintas (citrato, óxido, bitartrato…): la dosis es de la sal y a veces cambia el producto (betaína HCl es ácido digestivo; betaína anhidra es TMG). Se pueden buscar con el filtro de término.
@@ -134,6 +134,6 @@ Fue el error que reveló que el método tenía huecos, así que sirve para expli
 
 - **¿Por qué reglas y no un modelo o coincidencia aproximada?** Porque en química las falsas coincidencias importan (NMN y NADH no son NAD+; DL-fenilalanina no es L-fenilalanina) y con reglas puedo explicar y corregir cada caso. La coincidencia aproximada es un siguiente paso para encontrar candidatos, no para decidir.
 - **¿Qué tan exacto es?** No lo medí con una muestra aleatoria; revisé de forma sistemática los 1,000 ingredientes más comunes (85 % de las filas). Lo mejor que puedo decir es que cubre los casos más frecuentes y que cada agrupación se puede auditar.
-- **¿Por qué extracto y polvo cuentan como uno?** Es una decisión: sirve para contar productos por planta. Lo documenté y agregué un filtro por término en el nombre original para separarlos.
+- **¿Por qué extracto y polvo cuentan como uno?** Es una decisión: sirve para contar productos por planta. Lo documenté y agregué opciones de «término» (el nombre original sin agrupar) en el filtro de ingrediente para separarlos.
 - **¿Cómo sabes que no te faltan casos como NAD?** No puedo asegurar que no falte ninguno, pero no dependo de mi intuición: revisé los ingredientes más comunes con un procedimiento reproducible (`candidatos_calificadores.py`) y dejé registrado qué se fusionó y qué se revisó y se descartó.
 - **¿Qué hiciste cuando encontraste un error?** El caso de NAD: documenté el problema (la búsqueda alcanzaba unas 100 etiquetas de unas 510 reales), agregué reglas para los compuestos relacionados y verifiqué el resultado en la tabla de auditoría.
